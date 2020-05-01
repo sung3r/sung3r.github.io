@@ -6,13 +6,15 @@
   <meta http-equiv="cache-control" content="no-cache">
   <meta http-equiv="expires" content="0">
   
-  <title>Sung3r&#39;s Blog</title>
+  <title>某次强制关机后引发的血案 | Sung3r&#39;s Blog</title>
   <meta name="author" content="sung3r">
+  
+  <meta name="description" content="记录Mac环境配置过程">
   
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="某次强制关机后引发的血案"/>
   <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
 
   
@@ -93,271 +95,33 @@
 
   <div class="container">
   	<div class="content">
-    	 <div class="page-header logo">
-  <h1>Sung3r&#39;s Blog<span class="blink-fast">|</span></h1>
-</div>
+    	 
 
-<div class="row page">
 
 	
+		<div class="page-header">
+			<h1> 某次强制关机后引发的血案</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
 	<div class="col-md-9">
 	
 
-		<div class="slogan">
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> 记录Mac环境配置过程
+		 </div> <!-- alert -->
+	  		
 
-
-		<i class="fa fa-heart blink-slow"></i>
-
-		走过一趟，总要留下点什么
-
-</div>    
-
-		<div id="top_search"></div>
-		<div class="mypage">
-		
-		<!-- title and entry -->
-		
-			
-	
-	<!-- display as entry -->
-<div class="row">
-	<div class="col-md-8">
-		<h3 class="title">
-			<a href="/2020/05/01/某次强制关机后引发的血案/" title="记录Mac环境配置过程">某次强制关机后引发的血案</a>
-		</h3>
-		</div>
-	<div class="col-md-4">
-		<div class="date">post @ 2020-05-01  </div>
-		</div>
-	</div>
-	
-
-
-			<!--
-<div class="entry">
-  <div class="row">
-	
-	
-
-		
-        
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-		
-            
-            <p class="post">&lt;p&gt;#0x00强制重启后无限菊花&lt;br&gt;前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。&lt;/p&gt;
-&lt;p&gt;后来基本上能尝试的方法都尝试了。。。大致这几种&lt;br&gt;1.开机按住&lt;code&gt;command + R&lt;/code&gt;键，进入macOS恢复界面，打开终端&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;#进入缓存目录&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;$ cd &amp;#x2F;Volumes&amp;#x2F;Macintosh&amp;#x2F;var&amp;#x2F;db&amp;#x2F;caches&amp;#x2F;opendirectory&amp;#x2F;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;#删除缓存数据库&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;$ mv .&amp;#x2F;mbr_cache .&amp;#x2F;mar_cache-old&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;不行。。。&lt;br&gt;2.重置PRAM：开机按住&lt;code&gt;Control+Command&lt;/code&gt;并保持3秒，试了不行&lt;br&gt;3.重置NVRem：开机按住&lt;code&gt;Option+Command+R+P&lt;/code&gt;并保持30秒，也不行&lt;br&gt;4.开机&lt;code&gt;Command+S&lt;/code&gt;，出现命令行提示符后输入以下命令&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mount -uw &amp;#x2F; &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;mv &amp;#x2F;var&amp;#x2F;db&amp;#x2F;.AppleSetupDone &amp;#x2F;var&amp;#x2F;db&amp;#x2F;.AppleSetupDone-old&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;reboot&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;依旧不行&lt;br&gt;5.开机按住&lt;code&gt;shift&lt;/code&gt;，貌似安全模式，进去有safari能联网查资料，没用。。。&lt;br&gt;6.开机按住&lt;code&gt;D&lt;/code&gt;，硬件自检，没检测到啥错误。。&lt;br&gt;7.开机按住&lt;code&gt;command + R&lt;/code&gt;键，进入磁盘工具，急救，磁盘检测正常，没桃子用。。。&lt;/p&gt;
-&lt;p&gt;想起以前问过客服，没开启磁盘加密的情况下是能直接覆盖安装系统的，不需要抹除，数据不会丢失。就这样傻傻的花了一个多小时安装系统，重启过后，还是一样的情况。。。醉了，这办法也不灵了&lt;/p&gt;
-&lt;p&gt;没办法，直接抹除重装&amp;gt;_&amp;lt;，先进恢复模式把重要资料搞出来，毕竟数据无价。在&lt;code&gt;磁盘工具-&amp;gt;文件-&amp;gt;新建映像-&amp;gt;来自文件夹的映像...&lt;/code&gt;选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。&lt;/p&gt;
-&lt;p&gt;一个多小时后。。。终于装好了，但所有的环境都丢失了，然后就有了下文。。。立个flag：每周备份一次TimeMachine&lt;/p&gt;
-&lt;p&gt;#0x01开始前的几个重要工具&lt;br&gt;后面用到的软件可以从以下网站下载，安全性自测，不保证没有后门&amp;gt;_&amp;lt;&lt;br&gt;&lt;a href=&#34;https://xclient.info&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://xclient.info&lt;/a&gt;&lt;br&gt;&lt;a href=&#34;https://www.macdo.cn/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.macdo.cn/&lt;/a&gt;&lt;br&gt;&lt;a href=&#34;https://macwk.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://macwk.com/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;1.Google Chrome –不多说直接下载最新版，方便同步书签查资料。&lt;br&gt;2.Shadowsocks-NG R8 –mac最好用的ss客户端，fq必备&lt;br&gt;3.Proxifier –给终端开代理，神器。&lt;br&gt;4.Quiver –最好用的笔记本，方便记录。可从&lt;a href=&#34;https://github.com/HappenApps/Quiver/wiki/Themes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;HappenApps/Quiver&lt;/a&gt;下载各种主题进行配置。&lt;br&gt;5.NeatDownloadManager –mac平台的IDM，多线程下载工具，貌似也支持win&lt;br&gt;6.AnyDesk –TeamView的替代工具，管理远程主机。硬盘空间少，得省着点用，诸如Android Studio等工具我就装在远程win主机。&lt;br&gt;7.Docker Desktop –本地linux环境我采用docker，毕竟8g的内存能省则省，配合ancypwn食用更佳😌。实在需要用虚拟机就远程连win系统映射出端口。&lt;br&gt;8.eZip –简单易用的解压工具。&lt;br&gt;另外还有某盘、某Q，用来下载、传资料。&lt;/p&gt;
-&lt;p&gt;再有几个基本操作:&lt;br&gt;1.显示隐藏文件&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;defaults write com.apple.finder AppleShowAllFiles -bool true&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;KillAll Finder&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;meta&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;bash&#34;&gt;重新隐藏&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;defaults write com.apple.finder AppleShowAllFiles -bool false&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;KillAll Finder&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;2.Mac应用”已损坏，打不开&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sudo spctl --master-disable&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;系统偏好设置-&amp;gt;安全性与隐私-&amp;gt;通用，选中&lt;code&gt;任何来源&lt;/code&gt;选项&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/C404FC1895F4CE9B43BAD4A2EBF7547B.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;3.强制退出应用&lt;br&gt;例如Finder&lt;br&gt;窗口左上角的苹果标志-&amp;gt;强制退出-&amp;gt;Finder-&amp;gt;重新启动&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/2BEACDD481ECE4324BF8D666EAF6B51C.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;4.pip设置国内源&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mkdir ~&amp;#x2F;.pip &amp;amp;&amp;amp; cd ~&amp;#x2F;.pip&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;nano pip.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;添加&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;[global]&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;index-url&amp;#x3D;http:&amp;#x2F;&amp;#x2F;mirrors.aliyun.com&amp;#x2F;pypi&amp;#x2F;simple&amp;#x2F;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;[install]&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;trusted-host&amp;#x3D;mirrors.aliyun.com&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;#0x02iTerm2&lt;br&gt;基本工具装好后，先来配iTerm2，最好用的终端，没有之一。再配上以下主题，敲代码就很舒服。&lt;br&gt;转自: &lt;a href=&#34;https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;打造 Mac 下高颜值好用的终端环境&lt;/a&gt;&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/4443764A326E7084E8D300E993129E00.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;安装brew，一条命令的事。期间会安装&lt;code&gt;commandline tool&lt;/code&gt;，这里一开全局代理就报错，先关掉。然后会向&lt;code&gt;https://raw.githubusercontent.com/&lt;/code&gt;请求文件，这里要把代理开起来。最近网络咋这么不稳，醉了!! –吐槽一下&amp;gt;_&amp;lt;&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;/bin/bash -c &#34;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)&#34;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;###安装iTerm2&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew tap homebrew/cask-cask&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;brew cask install iterm2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;安装完以后在Launchpad找到iTerm2&lt;br&gt;&lt;code&gt;Preferences-&amp;gt;Appearance-&amp;gt;Theme&lt;/code&gt;主题选Minimal&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/33BC5768715E925C61B76898FDDC165E.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;选中&lt;code&gt;Status bar enable&lt;/code&gt;打开状态栏，效果如下&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/7CBF43A66362E3E7C5B8FA1EBC60A8B3.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;确认终端的配色是&lt;code&gt;xterm-256color&lt;/code&gt;，没改过的话，默认就是&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/B3D753F279CA7BC52C070E52055D9E57.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;iTerm默认的配色太丑，&lt;a href=&#34;https://github.com/mbadolato/iTerm2-Color-Schemes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iTerm2-Color-Schemes&lt;/a&gt;是一款开源的配色合集，下载下来导入终端&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mkdir ~/.iterm2 &amp;amp;&amp;amp; cd ~/.iterm2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;git clone https://github.com/mbadolato/iTerm2-Color-Schemes&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;导入配色方案Dracula，配色方案放在&lt;code&gt;iTerm2-Color-Schemes/schemes&lt;/code&gt;&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/6030D2370693B84E02D97C66FDFC54D4.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;默认字体不带以下这些图标，需要另外安装&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/44D7960ED7FE0D16BE4F4BCAFC12E6D4.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;安装字体，下载完成后这样设置&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew tap homebrew/cask-fonts&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;brew cask install font-hack-nerd-font&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/3A9638DC4BAA4BF67FD4D7D0C8784CB0.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;###安装zsh&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew install zsh&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;默认的shell是bash，需要修改为zsh&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sudo sh -c &#34;echo $(which zsh) &amp;gt;&amp;gt; /etc/shells&#34;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;chsh -s $(which zsh)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;安装oh-my-zsh&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sh -c &amp;quot;$(curl -fsSL https:&amp;#x2F;&amp;#x2F;raw.githubusercontent.com&amp;#x2F;robbyrussell&amp;#x2F;oh-my-zsh&amp;#x2F;master&amp;#x2F;tools&amp;#x2F;install.sh)&amp;quot;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-<p>
-		
-
-	
-
-	</div>
-  <a type="button" href="/2020/05/01/某次强制关机后引发的血案/#more" class="btn btn-default more">Read More</a>
-</div>
-
--->
-<div class="entry">
-  <div class="row">
-	
-	
-		<p>#0x00强制重启后无限菊花<br>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
+	  <p>#0x00强制重启后无限菊花<br>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
 <p>后来基本上能尝试的方法都尝试了。。。大致这几种<br>1.开机按住<code>command + R</code>键，进入macOS恢复界面，打开终端</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#进入缓存目录</span><br><span class="line">$ cd &#x2F;Volumes&#x2F;Macintosh&#x2F;var&#x2F;db&#x2F;caches&#x2F;opendirectory&#x2F;</span><br><span class="line">#删除缓存数据库</span><br><span class="line">$ mv .&#x2F;mbr_cache .&#x2F;mar_cache-old</span><br></pre></td></tr></table></figure>
 <p>不行。。。<br>2.重置PRAM：开机按住<code>Control+Command</code>并保持3秒，试了不行<br>3.重置NVRem：开机按住<code>Option+Command+R+P</code>并保持30秒，也不行<br>4.开机<code>Command+S</code>，出现命令行提示符后输入以下命令</p>
@@ -511,99 +275,133 @@
 
 <p>这样就搞定了<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/44D2CE5E322F37B6EBCC435679B233A8.jpg" alt></p>
 
-	
-	</div>
-  <a type="button" href="/2020/05/01/某次强制关机后引发的血案/#more" class="btn btn-default more">Read More</a>
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
 </div>
 
-		
-
-		</div>
-
-		<!-- pagination -->
-		<div>
-  		<center>
-		<div class="pagination">
-
-   
-</div>
-
-  		</center>
-		</div>
-
-		
-		
-	</div> <!-- col-md-9 -->
-
-	
-		<div class="col-md-3">
-	<div id="sidebar">
-	
-			
-  <div id="site_search">
-   <div class="form-group">
-    <input type="text" id="local-search-input" name="q" results="0" placeholder="Search" class="st-search-input st-default-search-input form-control"/>
-   </div>  
-  <div id="local-search-result"></div>
-  </div>
-
-
-		
-			
-	<div class="widget">
-		<h4>Categories</h4>
-		<ul class="tag_box inline list-unstyled">
-		
-			<li><a href="/categories/Docs/">Docs<span>1</span></a></li>
-		
-		</ul>
 	</div>
 
-		
-			
-	<div class="widget">
-		<h4>Tag Cloud</h4>
-		<ul class="tag_box inline list-unstyled">		
-		
-			<li><a href="/tags/环境配置/">环境配置<span>1</span></a></li>
-		
-		 
-		</ul>
-	</div>
+	
+	<span id="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/" class="leancloud-visitors view" data-flag-title="某次强制关机后引发的血案">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
 
+	<div class="pagination">
 
-		
-			
-<div class="widget">
-  <h4>Recent Posts</h4>
-  <ul class="entry list-unstyled">
     
-      <li>
-        <a href="/2020/05/01/某次强制关机后引发的血案/"  title="记录Mac环境配置过程" ><i class="fa fa-file-o"></i>某次强制关机后引发的血案</a>
-      </li>
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
     
-  </ul>
-</div>
+</section>
 
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2020-05-01 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/Docs/">Docs<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/环境配置/">环境配置<span>1</span></a></li>
+    </ul>
+	</div>
 		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
 			
-<div class="widget">
-	<h4>Links</h4>
-	<ul class="blogroll list-unstyled">
+		</div>
 	
-		<li><i class="fa fa-github"></i><a href="http://www.github.com/sung3r" title="My Github account." target="_blank"]);">My Github</a></li>
+	</div>
 	
-	</ul>
-</div>
-
+    <hr>
+	
+</div><!-- col-md-3 -->
 
 		
-	</div> <!-- sidebar -->
-</div> <!-- col-md-3 -->
 
+	</div>
 	
-	
-</div> <!-- row-fluid -->
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
 	</div>
   </div>
   <div class="container-narrow">
