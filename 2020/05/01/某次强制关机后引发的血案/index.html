@@ -121,7 +121,7 @@
 		 </div> <!-- alert -->
 	  		
 
-	  <p>#0x00强制重启后无限菊花<br>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
+	  <h1 id="0x00强制重启后无限菊花"><a href="#0x00强制重启后无限菊花" class="headerlink" title="0x00强制重启后无限菊花"></a>0x00强制重启后无限菊花</h1><p>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
 <p>后来基本上能尝试的方法都尝试了。。。大致这几种<br>1.开机按住<code>command + R</code>键，进入macOS恢复界面，打开终端</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#进入缓存目录</span><br><span class="line">$ cd &#x2F;Volumes&#x2F;Macintosh&#x2F;var&#x2F;db&#x2F;caches&#x2F;opendirectory&#x2F;</span><br><span class="line">#删除缓存数据库</span><br><span class="line">$ mv .&#x2F;mbr_cache .&#x2F;mar_cache-old</span><br></pre></td></tr></table></figure>
 <p>不行。。。<br>2.重置PRAM：开机按住<code>Control+Command</code>并保持3秒，试了不行<br>3.重置NVRem：开机按住<code>Option+Command+R+P</code>并保持30秒，也不行<br>4.开机<code>Command+S</code>，出现命令行提示符后输入以下命令</p>
@@ -130,7 +130,7 @@
 <p>想起以前问过客服，没开启磁盘加密的情况下是能直接覆盖安装系统的，不需要抹除，数据不会丢失。就这样傻傻的花了一个多小时安装系统，重启过后，还是一样的情况。。。醉了，这办法也不灵了</p>
 <p>没办法，直接抹除重装&gt;_&lt;，先进恢复模式把重要资料搞出来，毕竟数据无价。在<code>磁盘工具-&gt;文件-&gt;新建映像-&gt;来自文件夹的映像...</code>选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。</p>
 <p>一个多小时后。。。终于装好了，但所有的环境都丢失了，然后就有了下文。。。立个flag：每周备份一次TimeMachine</p>
-<p>#0x01开始前的几个重要工具<br>后面用到的软件可以从以下网站下载，安全性自测，不保证没有后门&gt;_&lt;<br><a href="https://xclient.info" target="_blank" rel="noopener">https://xclient.info</a><br><a href="https://www.macdo.cn/" target="_blank" rel="noopener">https://www.macdo.cn/</a><br><a href="https://macwk.com/" target="_blank" rel="noopener">https://macwk.com/</a></p>
+<h1 id="0x01开始前的几个重要工具"><a href="#0x01开始前的几个重要工具" class="headerlink" title="0x01开始前的几个重要工具"></a>0x01开始前的几个重要工具</h1><p>后面用到的软件可以从以下网站下载，安全性自测，不保证没有后门&gt;_&lt;<br><a href="https://xclient.info" target="_blank" rel="noopener">https://xclient.info</a><br><a href="https://www.macdo.cn/" target="_blank" rel="noopener">https://www.macdo.cn/</a><br><a href="https://macwk.com/" target="_blank" rel="noopener">https://macwk.com/</a></p>
 <p>1.Google Chrome –不多说直接下载最新版，方便同步书签查资料。<br>2.Shadowsocks-NG R8 –mac最好用的ss客户端，fq必备<br>3.Proxifier –给终端开代理，神器。<br>4.Quiver –最好用的笔记本，方便记录。可从<a href="https://github.com/HappenApps/Quiver/wiki/Themes" target="_blank" rel="noopener">HappenApps/Quiver</a>下载各种主题进行配置。<br>5.NeatDownloadManager –mac平台的IDM，多线程下载工具，貌似也支持win<br>6.AnyDesk –TeamView的替代工具，管理远程主机。硬盘空间少，得省着点用，诸如Android Studio等工具我就装在远程win主机。<br>7.Docker Desktop –本地linux环境我采用docker，毕竟8g的内存能省则省，配合ancypwn食用更佳😌。实在需要用虚拟机就远程连win系统映射出端口。<br>8.eZip –简单易用的解压工具。<br>另外还有某盘、某Q，用来下载、传资料。</p>
 <p>再有几个基本操作:<br>1.显示隐藏文件</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">defaults write com.apple.finder AppleShowAllFiles -bool true</span><br><span class="line">KillAll Finder</span><br><span class="line"><span class="meta">#</span><span class="bash">重新隐藏</span></span><br><span class="line">defaults write com.apple.finder AppleShowAllFiles -bool false</span><br><span class="line">KillAll Finder</span><br></pre></td></tr></table></figure>
@@ -145,7 +145,7 @@
 <p>添加</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">index-url&#x3D;http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;pypi&#x2F;simple&#x2F;</span><br><span class="line">[install]</span><br><span class="line">trusted-host&#x3D;mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
 
-<p>#0x02iTerm2<br>基本工具装好后，先来配iTerm2，最好用的终端，没有之一。再配上以下主题，敲代码就很舒服。<br>转自: <a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">打造 Mac 下高颜值好用的终端环境</a><br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/4443764A326E7084E8D300E993129E00.jpg" alt></p>
+<h1 id="0x02iTerm2"><a href="#0x02iTerm2" class="headerlink" title="0x02iTerm2"></a>0x02iTerm2</h1><p>基本工具装好后，先来配iTerm2，最好用的终端，没有之一。再配上以下主题，敲代码就很舒服。<br>转自: <a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">打造 Mac 下高颜值好用的终端环境</a><br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/4443764A326E7084E8D300E993129E00.jpg" alt></p>
 <p>安装brew，一条命令的事。期间会安装<code>commandline tool</code>，这里一开全局代理就报错，先关掉。然后会向<code>https://raw.githubusercontent.com/</code>请求文件，这里要把代理开起来。最近网络咋这么不稳，醉了!! –吐槽一下&gt;_&lt;</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</span><br></pre></td></tr></table></figure>
 
@@ -209,7 +209,7 @@
 <p>如何修复呢？只需要在 vscode 的配置文件中加入下面的配置：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;terminal.integrated.fontFamily&quot;: &quot;Hack Nerd Font&quot;,</span><br><span class="line">&quot;terminal.integrated.fontSize&quot;: 18,</span><br></pre></td></tr></table></figure>
 
-<p>#0x03ancypwn<br>###虚拟环境<br>避免损坏系统，先安装虚拟环境</p>
+<h1 id="0x03ancypwn"><a href="#0x03ancypwn" class="headerlink" title="0x03ancypwn"></a>0x03ancypwn</h1><p>###虚拟环境<br>避免损坏系统，先安装虚拟环境</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install pyenv</span><br></pre></td></tr></table></figure>
 
 <p>编辑<code>.zshrc</code></p>
@@ -380,7 +380,7 @@ new Valine(valineConfig);
 	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
 	   <div id="toc" class="toc collapse in">
 		   <span class="toc-title">Contents</span>
-			
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#0x00强制重启后无限菊花"><span class="toc-article-text">0x00强制重启后无限菊花</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#0x01开始前的几个重要工具"><span class="toc-article-text">0x01开始前的几个重要工具</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#0x02iTerm2"><span class="toc-article-text">0x02iTerm2</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#0x03ancypwn"><span class="toc-article-text">0x03ancypwn</span></a></li></ol>
 		</div>
 	
 	</div>
