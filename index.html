@@ -123,6 +123,70 @@
 <div class="row">
 	<div class="col-md-8">
 		<h3 class="title">
+			<a href="/2021/01/31/编译SerenityOS操作系统/" title="SerenityOS编译步骤">编译SerenityOS操作系统</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-01-31  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="https://github.com/SerenityOS/serenity" target="_blank" rel="noopener">SerenityOS</a>是一套用于x86计算机的图形化类Unix操作系统。为了解决hxp 36C3 CTF的wisdom这道题，首先需要编译出该系统，以下是编译步骤。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612088652182-1612088652218.png" alt="title"></p>
+<h1 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ubuntu 20.04</span><br><span class="line">gcc 10.2.0</span><br><span class="line">cmake 3.19.2</span><br></pre></td></tr></table></figure>
+
+<p>安装ubuntu的dependencies</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install build-essential curl libmpfr-dev libmpc-dev libgmp-dev e2fsprogs qemu-system-i386 qemu-utils</span><br></pre></td></tr></table></figure>
+
+<p>保证gcc版本&gt;=10</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:ubuntu-toolchain-r&#x2F;test</span><br><span class="line">sudo apt install gcc-10 g++-10</span><br><span class="line">sudo update-alternatives --install &#x2F;usr&#x2F;bin&#x2F;gcc gcc &#x2F;usr&#x2F;bin&#x2F;gcc-10 100 --slave &#x2F;usr&#x2F;bin&#x2F;g++ g++ &#x2F;usr&#x2F;bin&#x2F;g++-10</span><br></pre></td></tr></table></figure>
+
+<p>保证cmake版本&gt;=3.16，官网下载<code>3.19.2</code>最新版本编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;bootstrap</span><br><span class="line">make -j8</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+
+<h1 id="Proxy"><a href="#Proxy" class="headerlink" title="Proxy"></a>Proxy</h1>
+	
+
+	</div>
+  <a type="button" href="/2021/01/31/编译SerenityOS操作系统/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p><a href="https://github.com/SerenityOS/serenity" target="_blank" rel="noopener">SerenityOS</a>是一套用于x86计算机的图形化类Unix操作系统。为了解决hxp 36C3 CTF的wisdom这道题，首先需要编译出该系统，以下是编译步骤。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612088652182-1612088652218.png" alt="title"></p>
+<h1 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ubuntu 20.04</span><br><span class="line">gcc 10.2.0</span><br><span class="line">cmake 3.19.2</span><br></pre></td></tr></table></figure>
+
+<p>安装ubuntu的dependencies</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install build-essential curl libmpfr-dev libmpc-dev libgmp-dev e2fsprogs qemu-system-i386 qemu-utils</span><br></pre></td></tr></table></figure>
+
+<p>保证gcc版本&gt;=10</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:ubuntu-toolchain-r&#x2F;test</span><br><span class="line">sudo apt install gcc-10 g++-10</span><br><span class="line">sudo update-alternatives --install &#x2F;usr&#x2F;bin&#x2F;gcc gcc &#x2F;usr&#x2F;bin&#x2F;gcc-10 100 --slave &#x2F;usr&#x2F;bin&#x2F;g++ g++ &#x2F;usr&#x2F;bin&#x2F;g++-10</span><br></pre></td></tr></table></figure>
+
+<p>保证cmake版本&gt;=3.16，官网下载<code>3.19.2</code>最新版本编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;bootstrap</span><br><span class="line">make -j8</span><br><span class="line">sudo make install</span><br></pre></td></tr></table></figure>
+
+<h1 id="Proxy"><a href="#Proxy" class="headerlink" title="Proxy"></a>Proxy</h1>
+	
+	</div>
+  <a type="button" href="/2021/01/31/编译SerenityOS操作系统/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
 			<a href="/2020/05/01/某次强制关机后引发的血案/" title="记录Mac环境配置过程">某次强制关机后引发的血案</a>
 		</h3>
 		</div>
@@ -138,214 +202,15 @@
   <div class="row">
 	
 	
-
-		
-        
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-            
-            
-		
-		
-            
-            <p class="post">&lt;h1 id=&#34;0x00-强制重启后无限菊花&#34;&gt;&lt;a href=&#34;#0x00-强制重启后无限菊花&#34; class=&#34;headerlink&#34; title=&#34;0x00 强制重启后无限菊花&#34;&gt;&lt;/a&gt;0x00 强制重启后无限菊花&lt;/h1&gt;&lt;p&gt;前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。&lt;/p&gt;
-&lt;p&gt;后来基本上能尝试的方法都尝试了。。。大致这几种&lt;br&gt;1.开机按住&lt;code&gt;command + R&lt;/code&gt;键，进入macOS恢复界面，打开终端&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;#进入缓存目录&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;$ cd &amp;#x2F;Volumes&amp;#x2F;Macintosh&amp;#x2F;var&amp;#x2F;db&amp;#x2F;caches&amp;#x2F;opendirectory&amp;#x2F;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;#删除缓存数据库&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;$ mv .&amp;#x2F;mbr_cache .&amp;#x2F;mar_cache-old&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;不行。。。&lt;br&gt;2.重置PRAM：开机按住&lt;code&gt;Control+Command&lt;/code&gt;并保持3秒，试了不行&lt;br&gt;3.重置NVRem：开机按住&lt;code&gt;Option+Command+R+P&lt;/code&gt;并保持30秒，也不行&lt;br&gt;4.开机&lt;code&gt;Command+S&lt;/code&gt;，出现命令行提示符后输入以下命令&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mount -uw &amp;#x2F; &lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;mv &amp;#x2F;var&amp;#x2F;db&amp;#x2F;.AppleSetupDone &amp;#x2F;var&amp;#x2F;db&amp;#x2F;.AppleSetupDone-old&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;reboot&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;依旧不行&lt;br&gt;5.开机按住&lt;code&gt;shift&lt;/code&gt;，貌似安全模式，进去有safari能联网查资料，没用。。。&lt;br&gt;6.开机按住&lt;code&gt;D&lt;/code&gt;，硬件自检，没检测到啥错误。。&lt;br&gt;7.开机按住&lt;code&gt;command + R&lt;/code&gt;键，进入磁盘工具，急救，磁盘检测正常，没桃子用。。。&lt;/p&gt;
-&lt;p&gt;想起以前问过客服，没开启磁盘加密的情况下是能直接覆盖安装系统的，不需要抹除，数据不会丢失。就这样傻傻的花了一个多小时安装系统，重启过后，还是一样的情况。。。醉了，这办法也不灵了&lt;/p&gt;
-&lt;p&gt;没办法，直接抹除重装&amp;gt;_&amp;lt;，先进恢复模式把重要资料搞出来，毕竟数据无价。在&lt;code&gt;磁盘工具-&amp;gt;文件-&amp;gt;新建映像-&amp;gt;来自文件夹的映像...&lt;/code&gt;选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。&lt;/p&gt;
-&lt;p&gt;一个多小时后。。。终于装好了，但所有的环境都丢失了，然后就有了下文。。。立个flag：每周备份一次TimeMachine&lt;/p&gt;
-&lt;h1 id=&#34;0x01-开始前的几个重要工具&#34;&gt;&lt;a href=&#34;#0x01-开始前的几个重要工具&#34; class=&#34;headerlink&#34; title=&#34;0x01 开始前的几个重要工具&#34;&gt;&lt;/a&gt;0x01 开始前的几个重要工具&lt;/h1&gt;&lt;p&gt;后面用到的软件可以从以下网站下载，安全性自测，不保证没有后门&amp;gt;_&amp;lt;&lt;br&gt;&lt;a href=&#34;https://xclient.info&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://xclient.info&lt;/a&gt;&lt;br&gt;&lt;a href=&#34;https://www.macdo.cn/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://www.macdo.cn/&lt;/a&gt;&lt;br&gt;&lt;a href=&#34;https://macwk.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;https://macwk.com/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;1.Google Chrome –不多说直接下载最新版，方便同步书签查资料。&lt;br&gt;2.Shadowsocks-NG R8 –mac最好用的ss客户端，fq必备&lt;br&gt;3.Proxifier –给终端开代理，神器。&lt;br&gt;4.Quiver –最好用的笔记本，方便记录。可从&lt;a href=&#34;https://github.com/HappenApps/Quiver/wiki/Themes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;HappenApps/Quiver&lt;/a&gt;下载各种主题进行配置。&lt;br&gt;5.NeatDownloadManager –mac平台的IDM，多线程下载工具，貌似也支持win&lt;br&gt;6.AnyDesk –TeamView的替代工具，管理远程主机。硬盘空间少，得省着点用，诸如Android Studio等工具我就装在远程win主机。&lt;br&gt;7.Docker Desktop –本地linux环境我采用docker，毕竟8g的内存能省则省，配合ancypwn食用更佳😌。实在需要用虚拟机就远程连win系统映射出端口。&lt;br&gt;8.eZip –简单易用的解压工具。&lt;br&gt;另外还有某盘、某Q，用来下载、传资料。&lt;/p&gt;
-&lt;p&gt;再有几个基本操作:&lt;br&gt;1.显示隐藏文件&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;defaults write com.apple.finder AppleShowAllFiles -bool true&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;KillAll Finder&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;meta&#34;&gt;#&lt;/span&gt;&lt;span class=&#34;bash&#34;&gt;重新隐藏&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;defaults write com.apple.finder AppleShowAllFiles -bool false&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;KillAll Finder&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;2.Mac应用”已损坏，打不开&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sudo spctl --master-disable&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;系统偏好设置-&amp;gt;安全性与隐私-&amp;gt;通用，选中&lt;code&gt;任何来源&lt;/code&gt;选项&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/C404FC1895F4CE9B43BAD4A2EBF7547B.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;3.强制退出应用&lt;br&gt;例如Finder&lt;br&gt;窗口左上角的苹果标志-&amp;gt;强制退出-&amp;gt;Finder-&amp;gt;重新启动&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/2BEACDD481ECE4324BF8D666EAF6B51C.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;4.pip设置国内源&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mkdir ~&amp;#x2F;.pip &amp;amp;&amp;amp; cd ~&amp;#x2F;.pip&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;nano pip.conf&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;添加&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;[global]&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;index-url&amp;#x3D;http:&amp;#x2F;&amp;#x2F;mirrors.aliyun.com&amp;#x2F;pypi&amp;#x2F;simple&amp;#x2F;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;[install]&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;trusted-host&amp;#x3D;mirrors.aliyun.com&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;h1 id=&#34;0x02-iTerm2&#34;&gt;&lt;a href=&#34;#0x02-iTerm2&#34; class=&#34;headerlink&#34; title=&#34;0x02 iTerm2&#34;&gt;&lt;/a&gt;0x02 iTerm2&lt;/h1&gt;&lt;p&gt;基本工具装好后，先来配iTerm2，最好用的终端，没有之一。再配上以下主题，敲代码就很舒服。&lt;br&gt;转自: &lt;a href=&#34;https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;打造 Mac 下高颜值好用的终端环境&lt;/a&gt;&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/4443764A326E7084E8D300E993129E00.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;安装brew，一条命令的事。期间会安装&lt;code&gt;commandline tool&lt;/code&gt;，这里一开全局代理就报错，先关掉。然后会向&lt;code&gt;https://raw.githubusercontent.com/&lt;/code&gt;请求文件，这里要把代理开起来。最近网络咋这么不稳，醉了!! –吐槽一下&amp;gt;_&amp;lt;&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;/bin/bash -c &#34;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)&#34;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;h2 id=&#34;安装iTerm2&#34;&gt;&lt;a href=&#34;#安装iTerm2&#34; class=&#34;headerlink&#34; title=&#34;安装iTerm2&#34;&gt;&lt;/a&gt;安装iTerm2&lt;/h2&gt;&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew tap homebrew/cask-cask&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;brew cask install iterm2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;安装完以后在Launchpad找到iTerm2&lt;br&gt;&lt;code&gt;Preferences-&amp;gt;Appearance-&amp;gt;Theme&lt;/code&gt;主题选Minimal&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/33BC5768715E925C61B76898FDDC165E.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;选中&lt;code&gt;Status bar enable&lt;/code&gt;打开状态栏，效果如下&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/7CBF43A66362E3E7C5B8FA1EBC60A8B3.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;确认终端的配色是&lt;code&gt;xterm-256color&lt;/code&gt;，没改过的话，默认就是&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/B3D753F279CA7BC52C070E52055D9E57.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;iTerm默认的配色太丑，&lt;a href=&#34;https://github.com/mbadolato/iTerm2-Color-Schemes&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;iTerm2-Color-Schemes&lt;/a&gt;是一款开源的配色合集，下载下来导入终端&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;mkdir ~/.iterm2 &amp;amp;&amp;amp; cd ~/.iterm2&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;git clone https://github.com/mbadolato/iTerm2-Color-Schemes&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;导入配色方案Dracula，配色方案放在&lt;code&gt;iTerm2-Color-Schemes/schemes&lt;/code&gt;&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/6030D2370693B84E02D97C66FDFC54D4.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;默认字体不带以下这些图标，需要另外安装&lt;br&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/44D7960ED7FE0D16BE4F4BCAFC12E6D4.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;安装字体，下载完成后这样设置&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew tap homebrew/cask-fonts&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;brew cask install font-hack-nerd-font&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/3A9638DC4BAA4BF67FD4D7D0C8784CB0.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;h2 id=&#34;安装zsh&#34;&gt;&lt;a href=&#34;#安装zsh&#34; class=&#34;headerlink&#34; title=&#34;安装zsh&#34;&gt;&lt;/a&gt;安装zsh&lt;/h2&gt;&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;brew install zsh&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;默认的shell是bash，需要修改为zsh&lt;/p&gt;
-&lt;figure class=&#34;highlight shell&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sudo sh -c &#34;echo $(which zsh) &amp;gt;&amp;gt; /etc/shells&#34;&lt;/span&gt;&lt;br&gt;&lt;span class=&#34;line&#34;&gt;chsh -s $(which zsh)&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;安装oh-my-zsh&lt;/p&gt;
-&lt;figure class=&#34;highlight plain&#34;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&#34;gutter&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&#34;code&#34;&gt;&lt;pre&gt;&lt;span class=&#34;line&#34;&gt;sh -c &amp;quot;$(curl -fsSL https:&amp;#x2F;&amp;#x2F;raw.githubusercontent.com&amp;#x2F;robbyrussell&amp;#x2F;oh-my-zsh&amp;#x2F;master&amp;#x2F;tools&amp;#x2F;install.sh)&amp;quot;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-&lt;p&gt;&lt;img src=&#34;/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/2181C08D3A854DBA44213D2575D4C9B3.jpg&#34; alt&gt;&lt;/p&gt;
-&lt;p&gt;为了实现前面看起来很舒服😌的主题，要下载&lt;a href=&#34;https://github.com/bhilburn/powerlevel9k&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;powerlevel9k&lt;/a&gt;&lt;/p&gt;
-<p>
-		
-
+		<h1 id="强制重启后无限菊花"><a href="#强制重启后无限菊花" class="headerlink" title="强制重启后无限菊花"></a>强制重启后无限菊花</h1><p>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
+<p>后来基本上能尝试的方法都尝试了。。。大致这几种<br>1.开机按住<code>command + R</code>键，进入macOS恢复界面，打开终端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#进入缓存目录</span><br><span class="line">$ cd &#x2F;Volumes&#x2F;Macintosh&#x2F;var&#x2F;db&#x2F;caches&#x2F;opendirectory&#x2F;</span><br><span class="line">#删除缓存数据库</span><br><span class="line">$ mv .&#x2F;mbr_cache .&#x2F;mar_cache-old</span><br></pre></td></tr></table></figure>
+<p>不行。。。<br>2.重置PRAM：开机按住<code>Control+Command</code>并保持3秒，试了不行<br>3.重置NVRem：开机按住<code>Option+Command+R+P</code>并保持30秒，也不行<br>4.开机<code>Command+S</code>，出现命令行提示符后输入以下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mount -uw &#x2F; </span><br><span class="line">mv &#x2F;var&#x2F;db&#x2F;.AppleSetupDone &#x2F;var&#x2F;db&#x2F;.AppleSetupDone-old</span><br><span class="line">reboot</span><br></pre></td></tr></table></figure>
+<p>依旧不行<br>5.开机按住<code>shift</code>，貌似安全模式，进去有safari能联网查资料，没用。。。<br>6.开机按住<code>D</code>，硬件自检，没检测到啥错误。。<br>7.开机按住<code>command + R</code>键，进入磁盘工具，急救，磁盘检测正常，没桃子用。。。<br>8.没法开机可以先试试这个方法<a href="https://support.apple.com/zh-cn/HT201295" target="_blank" rel="noopener">如何重置Mac的SMC</a></p>
+<p>想起以前问过客服，没开启磁盘加密的情况下是能直接覆盖安装系统的，不需要抹除，数据不会丢失。就这样傻傻的花了一个多小时安装系统，重启过后，还是一样的情况。。。醉了，这办法也不灵了</p>
+<p>没办法，直接抹除重装，先进恢复模式把重要资料搞出来，毕竟数据无价。在<code>磁盘工具-&gt;文件-&gt;新建映像-&gt;来自文件夹的映像...</code>选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。</p>
+<p>一个多小时后。。。终于装好了，但所有的环境都丢失了。。。</p>
 	
 
 	</div>
@@ -357,158 +222,15 @@
   <div class="row">
 	
 	
-		<h1 id="0x00-强制重启后无限菊花"><a href="#0x00-强制重启后无限菊花" class="headerlink" title="0x00 强制重启后无限菊花"></a>0x00 强制重启后无限菊花</h1><p>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
+		<h1 id="强制重启后无限菊花"><a href="#强制重启后无限菊花" class="headerlink" title="强制重启后无限菊花"></a>强制重启后无限菊花</h1><p>前两天将mac关闭，等半天没关上，索性直接强制重启了，等再开机的时候。。。奔溃了，一致卡在开机进度条。</p>
 <p>后来基本上能尝试的方法都尝试了。。。大致这几种<br>1.开机按住<code>command + R</code>键，进入macOS恢复界面，打开终端</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#进入缓存目录</span><br><span class="line">$ cd &#x2F;Volumes&#x2F;Macintosh&#x2F;var&#x2F;db&#x2F;caches&#x2F;opendirectory&#x2F;</span><br><span class="line">#删除缓存数据库</span><br><span class="line">$ mv .&#x2F;mbr_cache .&#x2F;mar_cache-old</span><br></pre></td></tr></table></figure>
 <p>不行。。。<br>2.重置PRAM：开机按住<code>Control+Command</code>并保持3秒，试了不行<br>3.重置NVRem：开机按住<code>Option+Command+R+P</code>并保持30秒，也不行<br>4.开机<code>Command+S</code>，出现命令行提示符后输入以下命令</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mount -uw &#x2F; </span><br><span class="line">mv &#x2F;var&#x2F;db&#x2F;.AppleSetupDone &#x2F;var&#x2F;db&#x2F;.AppleSetupDone-old</span><br><span class="line">reboot</span><br></pre></td></tr></table></figure>
-<p>依旧不行<br>5.开机按住<code>shift</code>，貌似安全模式，进去有safari能联网查资料，没用。。。<br>6.开机按住<code>D</code>，硬件自检，没检测到啥错误。。<br>7.开机按住<code>command + R</code>键，进入磁盘工具，急救，磁盘检测正常，没桃子用。。。</p>
+<p>依旧不行<br>5.开机按住<code>shift</code>，貌似安全模式，进去有safari能联网查资料，没用。。。<br>6.开机按住<code>D</code>，硬件自检，没检测到啥错误。。<br>7.开机按住<code>command + R</code>键，进入磁盘工具，急救，磁盘检测正常，没桃子用。。。<br>8.没法开机可以先试试这个方法<a href="https://support.apple.com/zh-cn/HT201295" target="_blank" rel="noopener">如何重置Mac的SMC</a></p>
 <p>想起以前问过客服，没开启磁盘加密的情况下是能直接覆盖安装系统的，不需要抹除，数据不会丢失。就这样傻傻的花了一个多小时安装系统，重启过后，还是一样的情况。。。醉了，这办法也不灵了</p>
-<p>没办法，直接抹除重装&gt;_&lt;，先进恢复模式把重要资料搞出来，毕竟数据无价。在<code>磁盘工具-&gt;文件-&gt;新建映像-&gt;来自文件夹的映像...</code>选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。</p>
-<p>一个多小时后。。。终于装好了，但所有的环境都丢失了，然后就有了下文。。。立个flag：每周备份一次TimeMachine</p>
-<h1 id="0x01-开始前的几个重要工具"><a href="#0x01-开始前的几个重要工具" class="headerlink" title="0x01 开始前的几个重要工具"></a>0x01 开始前的几个重要工具</h1><p>后面用到的软件可以从以下网站下载，安全性自测，不保证没有后门&gt;_&lt;<br><a href="https://xclient.info" target="_blank" rel="noopener">https://xclient.info</a><br><a href="https://www.macdo.cn/" target="_blank" rel="noopener">https://www.macdo.cn/</a><br><a href="https://macwk.com/" target="_blank" rel="noopener">https://macwk.com/</a></p>
-<p>1.Google Chrome –不多说直接下载最新版，方便同步书签查资料。<br>2.Shadowsocks-NG R8 –mac最好用的ss客户端，fq必备<br>3.Proxifier –给终端开代理，神器。<br>4.Quiver –最好用的笔记本，方便记录。可从<a href="https://github.com/HappenApps/Quiver/wiki/Themes" target="_blank" rel="noopener">HappenApps/Quiver</a>下载各种主题进行配置。<br>5.NeatDownloadManager –mac平台的IDM，多线程下载工具，貌似也支持win<br>6.AnyDesk –TeamView的替代工具，管理远程主机。硬盘空间少，得省着点用，诸如Android Studio等工具我就装在远程win主机。<br>7.Docker Desktop –本地linux环境我采用docker，毕竟8g的内存能省则省，配合ancypwn食用更佳😌。实在需要用虚拟机就远程连win系统映射出端口。<br>8.eZip –简单易用的解压工具。<br>另外还有某盘、某Q，用来下载、传资料。</p>
-<p>再有几个基本操作:<br>1.显示隐藏文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">defaults write com.apple.finder AppleShowAllFiles -bool true</span><br><span class="line">KillAll Finder</span><br><span class="line"><span class="meta">#</span><span class="bash">重新隐藏</span></span><br><span class="line">defaults write com.apple.finder AppleShowAllFiles -bool false</span><br><span class="line">KillAll Finder</span><br></pre></td></tr></table></figure>
-
-<p>2.Mac应用”已损坏，打不开</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo spctl --master-disable</span><br></pre></td></tr></table></figure>
-<p>系统偏好设置-&gt;安全性与隐私-&gt;通用，选中<code>任何来源</code>选项<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/C404FC1895F4CE9B43BAD4A2EBF7547B.jpg" alt></p>
-<p>3.强制退出应用<br>例如Finder<br>窗口左上角的苹果标志-&gt;强制退出-&gt;Finder-&gt;重新启动<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/2BEACDD481ECE4324BF8D666EAF6B51C.jpg" alt></p>
-<p>4.pip设置国内源</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~&#x2F;.pip &amp;&amp; cd ~&#x2F;.pip</span><br><span class="line">nano pip.conf</span><br></pre></td></tr></table></figure>
-
-<p>添加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">index-url&#x3D;http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;pypi&#x2F;simple&#x2F;</span><br><span class="line">[install]</span><br><span class="line">trusted-host&#x3D;mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
-
-<h1 id="0x02-iTerm2"><a href="#0x02-iTerm2" class="headerlink" title="0x02 iTerm2"></a>0x02 iTerm2</h1><p>基本工具装好后，先来配iTerm2，最好用的终端，没有之一。再配上以下主题，敲代码就很舒服。<br>转自: <a href="https://blog.biezhi.me/2018/11/build-a-beautiful-mac-terminal-environment.html" target="_blank" rel="noopener">打造 Mac 下高颜值好用的终端环境</a><br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/4443764A326E7084E8D300E993129E00.jpg" alt></p>
-<p>安装brew，一条命令的事。期间会安装<code>commandline tool</code>，这里一开全局代理就报错，先关掉。然后会向<code>https://raw.githubusercontent.com/</code>请求文件，这里要把代理开起来。最近网络咋这么不稳，醉了!! –吐槽一下&gt;_&lt;</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装iTerm2"><a href="#安装iTerm2" class="headerlink" title="安装iTerm2"></a>安装iTerm2</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew tap homebrew/cask-cask</span><br><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
-
-<p>安装完以后在Launchpad找到iTerm2<br><code>Preferences-&gt;Appearance-&gt;Theme</code>主题选Minimal<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/33BC5768715E925C61B76898FDDC165E.jpg" alt></p>
-<p>选中<code>Status bar enable</code>打开状态栏，效果如下<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/7CBF43A66362E3E7C5B8FA1EBC60A8B3.jpg" alt></p>
-<p>确认终端的配色是<code>xterm-256color</code>，没改过的话，默认就是<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/B3D753F279CA7BC52C070E52055D9E57.jpg" alt></p>
-<p>iTerm默认的配色太丑，<a href="https://github.com/mbadolato/iTerm2-Color-Schemes" target="_blank" rel="noopener">iTerm2-Color-Schemes</a>是一款开源的配色合集，下载下来导入终端</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/.iterm2 &amp;&amp; cd ~/.iterm2</span><br><span class="line">git clone https://github.com/mbadolato/iTerm2-Color-Schemes</span><br></pre></td></tr></table></figure>
-
-<p>导入配色方案Dracula，配色方案放在<code>iTerm2-Color-Schemes/schemes</code><br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/6030D2370693B84E02D97C66FDFC54D4.jpg" alt></p>
-<p>默认字体不带以下这些图标，需要另外安装<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/44D7960ED7FE0D16BE4F4BCAFC12E6D4.jpg" alt></p>
-<p>安装字体，下载完成后这样设置</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew tap homebrew/cask-fonts</span><br><span class="line">brew cask install font-hack-nerd-font</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/3A9638DC4BAA4BF67FD4D7D0C8784CB0.jpg" alt></p>
-<h2 id="安装zsh"><a href="#安装zsh" class="headerlink" title="安装zsh"></a>安装zsh</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install zsh</span><br></pre></td></tr></table></figure>
-
-<p>默认的shell是bash，需要修改为zsh</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo sh -c "echo $(which zsh) &gt;&gt; /etc/shells"</span><br><span class="line">chsh -s $(which zsh)</span><br></pre></td></tr></table></figure>
-
-<p>安装oh-my-zsh</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c &quot;$(curl -fsSL https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh)&quot;</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/2181C08D3A854DBA44213D2575D4C9B3.jpg" alt></p>
-<p>为了实现前面看起来很舒服😌的主题，要下载<a href="https://github.com/bhilburn/powerlevel9k" target="_blank" rel="noopener">powerlevel9k</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;bhilburn&#x2F;powerlevel9k.git ~&#x2F;.oh-my-zsh&#x2F;custom&#x2F;themes&#x2F;powerlevel9k</span><br></pre></td></tr></table></figure>
-
-<p>修改<code>~/.zshrc</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;powerlevel9k&#x2F;powerlevel9k&quot;</span><br></pre></td></tr></table></figure>
-
-<p>终端现在变成酱紫<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/CD868E1B08E3914824E4EA6B47A5D606.jpg" alt></p>
-<p>为了让它看起来简洁一点，在<code>.zshrc</code>配置中添加这几行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">POWERLEVEL9K_MODE&#x3D;&quot;nerdfont-complete&quot;</span><br><span class="line"># Customise the Powerlevel9k prompts</span><br><span class="line">POWERLEVEL9K_LEFT_PROMPT_ELEMENTS&#x3D;(ssh dir vcs newline status)</span><br><span class="line">POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS&#x3D;()</span><br><span class="line">POWERLEVEL9K_PROMPT_ADD_NEWLINE&#x3D;true</span><br></pre></td></tr></table></figure>
-
-<h2 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h2><p>避免每次<code>brew install</code>都要先updte，往<code>.zshrc</code>添加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># Brew</span><br><span class="line">export HOMEBREW_NO_AUTO_UPDATE&#x3D;true</span><br></pre></td></tr></table></figure>
-
-<p>顺便添加别名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># My Alias</span><br><span class="line">alias cls&#x3D;&#39;clear&#39;</span><br><span class="line">alias ll&#x3D;&#39;ls -l&#39;</span><br><span class="line">alias la&#x3D;&#39;ls -a&#39;</span><br><span class="line">alias lls&#x3D;&#39;colorls&#39;</span><br><span class="line">alias vi&#x3D;&#39;vim&#39;</span><br><span class="line">alias ssr&#x3D;&quot;http_proxy&#x3D;http:&#x2F;&#x2F;127.0.0.1:1087 https_proxy&#x3D;http:&#x2F;&#x2F;127.0.0.1:1087&quot;</span><br><span class="line">alias grep&#x3D;&#39;grep --color&#x3D;auto&#39;</span><br></pre></td></tr></table></figure>
-
-<p>1.sudo<br>偶尔输入某个命令，提示没有权限，需要加sudo，这个时候按两下ESC，就会在命令行头部加上sudo<br>2.extract<br>自带插件，不需额外安装。功能强大的解压插件，所有类型的文件解压一个命令x全搞定，再也不需要去记tar后面到底是哪几个参数了。<br>3.autojump<br>这个插件主要帮助我们记住目录，一键直达。只要你脑海里有目录的几个字母，然后使用<code>j [你知道的]</code>按下<code>tab</code> 即可，不用<code>cd cd cd</code>慢慢找。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">brew install autojump</span><br><span class="line">#让配置文件生效</span><br><span class="line">[[ -s $(brew --prefix)&#x2F;etc&#x2F;profile.d&#x2F;autojump.sh ]] &amp;&amp; . $(brew --prefix)&#x2F;etc&#x2F;profile.d&#x2F;autojump.sh</span><br></pre></td></tr></table></figure>
-<p>4.vscode<br>能以<code>vs file_name</code>的形式新建、打开文件<br>5.zsh-autosuggestions<br>非常好用的一个插件，会记录你之前输入过的所有命令，并且自动匹配你可能想要输入命令，然后按→补全</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;zsh-users&#x2F;zsh-autosuggestions $&#123;ZSH_CUSTOM:-~&#x2F;.oh-my-zsh&#x2F;custom&#125;&#x2F;plugins&#x2F;zsh-autosuggestions</span><br></pre></td></tr></table></figure>
-<p>6.zsh-syntax-highlighting<br>命令太多，有时候记不住，等输入完了才知道命令输错了，这个插件直接在输入过程中就会提示你，当前命令是否正确，错误红色，正确绿色</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;zsh-users&#x2F;zsh-syntax-highlighting.git $&#123;ZSH_CUSTOM:-~&#x2F;.oh-my-zsh&#x2F;custom&#125;&#x2F;plugins&#x2F;zsh-syntax-highlighting</span><br></pre></td></tr></table></figure>
-
-<p>编辑<code>.zshrc</code>添加插件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git</span><br><span class="line">        sudo</span><br><span class="line">        vscode</span><br><span class="line">        extract</span><br><span class="line">        autojump</span><br><span class="line">        zsh-autosuggestions</span><br><span class="line">        zsh-syntax-highlighting</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<h2 id="colors"><a href="#colors" class="headerlink" title="colors"></a>colors</h2><p>colors 是一个 Ruby 实现的脚本，它可以配合 powerlevel9k 显示电脑上的文件图标（应该是通过后缀判断的），使用的效果如下：<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/9E84BC90E92CA250C2BB694B9EFFEBF1.jpg" alt></p>
-<p>安装后就可以使用了</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brew install ruby</span><br><span class="line">gem install colorls</span><br></pre></td></tr></table></figure>
-
-<p>设置别名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alias lls&#x3D;&#39;colorls&#39;</span><br></pre></td></tr></table></figure>
-
-<h2 id="修复VSCode终端"><a href="#修复VSCode终端" class="headerlink" title="修复VSCode终端"></a>修复VSCode终端</h2><p>这样配置后打开 VSCode 就变成这幅样子<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/91F89F67B95856EEA49A5562609770C3.jpg" alt></p>
-<p>如何修复呢？只需要在 vscode 的配置文件中加入下面的配置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;terminal.integrated.fontFamily&quot;: &quot;Hack Nerd Font&quot;,</span><br><span class="line">&quot;terminal.integrated.fontSize&quot;: 18,</span><br></pre></td></tr></table></figure>
-
-<h1 id="0x03-ancypwn"><a href="#0x03-ancypwn" class="headerlink" title="0x03 ancypwn"></a>0x03 ancypwn</h1><h2 id="虚拟环境"><a href="#虚拟环境" class="headerlink" title="虚拟环境"></a>虚拟环境</h2><p>避免损坏系统，先安装虚拟环境</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install pyenv</span><br></pre></td></tr></table></figure>
-
-<p>编辑<code>.zshrc</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Pyenv</span><br><span class="line">export PATH&#x3D;&quot;$HOME&#x2F;.pyenv&#x2F;bin:$PATH&quot;</span><br><span class="line">if which pyenv &gt; &#x2F;dev&#x2F;null; then eval &quot;$(pyenv init -)&quot;; fi</span><br></pre></td></tr></table></figure>
-
-<p>安装virtualenv、virtualenvwrapper</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install virtualenv</span><br><span class="line">pip install virtualenvwrapper</span><br></pre></td></tr></table></figure>
-
-<p>编辑<code>.zshrc</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># virtualenv</span><br><span class="line">export WORKON_HOME&#x3D;$HOME&#x2F;.virtualenvs</span><br><span class="line">export VIRTUALENVWRAPPER_SCRIPT&#x3D;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;virtualenvwrapper.sh</span><br><span class="line">export VIRTUALENVWRAPPER_PYTHON&#x3D;&#x2F;usr&#x2F;local&#x2F;opt&#x2F;python&#x2F;libexec&#x2F;bin&#x2F;python</span><br><span class="line">export VIRTUALENVWRAPPER_VIRTUALENV&#x3D;&#x2F;usr&#x2F;local&#x2F;bin&#x2F;virtualenv</span><br><span class="line">source &#x2F;usr&#x2F;local&#x2F;bin&#x2F;virtualenvwrapper.sh</span><br></pre></td></tr></table></figure>
-
-<p>重新打开终端，这时便可以创建虚拟环境，给ancypwn创建一个单独的环境</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pyenv install -l</span><br><span class="line">pyenv install 3.7.7</span><br><span class="line">pyenv rehash</span><br><span class="line">mkvirtualenv -p &#x2F;Users&#x2F;sung3r&#x2F;.pyenv&#x2F;versions&#x2F;3.7.7&#x2F;bin&#x2F;python magic3</span><br></pre></td></tr></table></figure>
-
-<h2 id="开始安装"><a href="#开始安装" class="headerlink" title="开始安装"></a>开始安装</h2><p>安装ancypwn</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pip install ancypwn&#x3D;&#x3D;0.3.1</span><br><span class="line">#or</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;ancypwn.git</span><br><span class="line">cd ancypwn &amp;&amp; pip install ancypwn-0.3.1-py3-none-any.whl</span><br></pre></td></tr></table></figure>
-
-<p>替换<code>ancypwn.py</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mv &#x2F;Users&#x2F;sung3r&#x2F;.virtualenvs&#x2F;magic3&#x2F;lib&#x2F;python3.7&#x2F;site-packages&#x2F;ancypwn&#x2F;ancypwn.py &#x2F;Users&#x2F;sung3r&#x2F;.virtualenvs&#x2F;magic3&#x2F;lib&#x2F;python3.7&#x2F;site-packages&#x2F;ancypwn&#x2F;ancypwn.py.orig</span><br><span class="line">cp .&#x2F;ancypwn.py &#x2F;Users&#x2F;sung3r&#x2F;.virtualenvs&#x2F;magic3&#x2F;lib&#x2F;python3.7&#x2F;site-packages&#x2F;ancypwn&#x2F;</span><br></pre></td></tr></table></figure>
-
-<p>拉docker镜像</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker pull auxy233&#x2F;ancypwn:16.04</span><br><span class="line">docker pull auxy233&#x2F;ancypwn:18.04</span><br><span class="line">docker pull auxy233&#x2F;ancypwn:18.10</span><br><span class="line">docker image tag auxy233&#x2F;ancypwn:16.04 ancypwn:16.04</span><br><span class="line">docker image tag auxy233&#x2F;ancypwn:18.04 ancypwn:18.04</span><br><span class="line">docker image tag auxy233&#x2F;ancypwn:18.10 ancypwn:18.10</span><br></pre></td></tr></table></figure>
-
-<p>安装XQuartz，设置该选项</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install xquartz</span><br></pre></td></tr></table></figure>
-<p><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/7D37418F00726CDD7A3FA25E50D702F9.jpg" alt></p>
-<p>编辑<code>.zshrc</code>，添加</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># ancypwn</span><br><span class="line">_runpwn() &#123;</span><br><span class="line">    sudo ancypwn run --ubuntu $1 --port 23946 --priv .</span><br><span class="line">&#125;</span><br><span class="line">alias runpwn&#x3D;_runpwn</span><br><span class="line">alias getpwn&#x3D;&quot;sudo ancypwn attach&quot;</span><br><span class="line">alias endpwn&#x3D;&quot;sudo ancypwn end&quot;</span><br></pre></td></tr></table></figure>
-
-<p>每次sudo都要输入密码，很烦&gt;_&lt;，配置免密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo -i</span><br><span class="line">nano &#x2F;etc&#x2F;sudoers</span><br></pre></td></tr></table></figure>
-
-<p>添加一项</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sung3r          ALL &#x3D; (ALL) NOPASSWD: ALL</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置容器"><a href="#配置容器" class="headerlink" title="配置容器"></a>配置容器</h2><p>安装基本工具</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt install net-tools       # ifconfig </span><br><span class="line">apt install iputils-ping    # ping</span><br><span class="line">apt install nano</span><br></pre></td></tr></table></figure>
-
-<p>更换成国内源</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mv &#x2F;etc&#x2F;apt&#x2F;sources.list &#x2F;etc&#x2F;apt&#x2F;sources.list.orig</span><br><span class="line">nano &#x2F;etc&#x2F;apt&#x2F;sources.list</span><br></pre></td></tr></table></figure>
-
-<p>编辑<code>sources.list</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#阿里源@16.04</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-proposed main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-backports main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-security main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-updates main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-proposed main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; xenial-backports main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">#清华源@16.04</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">#阿里源@18.04</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line">deb http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src http:&#x2F;&#x2F;mirrors.aliyun.com&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line"></span><br><span class="line">#清华源@18.04</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-updates main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-backports main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-security main restricted universe multiverse</span><br><span class="line">deb https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src https:&#x2F;&#x2F;mirrors.tuna.tsinghua.edu.cn&#x2F;ubuntu&#x2F; bionic-proposed main restricted universe multiverse</span><br></pre></td></tr></table></figure>
-
-<p>更新<br><code>apt-get update</code></p>
-<p>安装sakura（弹出调试终端）<br><code>apt install sakura</code></p>
-<p>安装<code>pwndbg</code>、<code>gef</code>、<code>peda</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd ~ &amp;&amp; mkdir gdb</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;pwndbg.git</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;gef.git</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;peda.git</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;Pwngdb.git</span><br></pre></td></tr></table></figure>
-
-<p>为了方便切换gdb插件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">cd ~ &amp;&amp; mkdir shell</span><br><span class="line">cd shell</span><br><span class="line">nano pwndbg</span><br><span class="line">nano gef</span><br><span class="line">nano peda</span><br><span class="line">nano gdbinit</span><br></pre></td></tr></table></figure>
-
-<p>分别填入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">#pwndbg</span><br><span class="line">#! &#x2F;bin&#x2F;bash</span><br><span class="line">cat &gt; &#x2F;root&#x2F;.gdbinit &lt;&lt;  EOF</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;pwndbg&#x2F;gdbinit.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;pwngdb.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;angelheap&#x2F;gdbinit.py</span><br><span class="line"></span><br><span class="line">define hook-run</span><br><span class="line">python</span><br><span class="line">import angelheap</span><br><span class="line">angelheap.init_angelheap()</span><br><span class="line">end</span><br><span class="line">end</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">#gef</span><br><span class="line">#! &#x2F;bin&#x2F;bash</span><br><span class="line">cat &gt; &#x2F;root&#x2F;.gdbinit &lt;&lt;  EOF</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;gef&#x2F;gef.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;pwngdb.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;angelheap&#x2F;gdbinit.py</span><br><span class="line"></span><br><span class="line">define hook-run</span><br><span class="line">python</span><br><span class="line">import angelheap</span><br><span class="line">angelheap.init_angelheap()</span><br><span class="line">end</span><br><span class="line">end</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">#peda</span><br><span class="line">#! &#x2F;bin&#x2F;bash</span><br><span class="line">cat &gt; &#x2F;root&#x2F;.gdbinit &lt;&lt;  EOF</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;peda&#x2F;peda.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;pwngdb.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;angelheap&#x2F;gdbinit.py</span><br><span class="line"></span><br><span class="line">define hook-run</span><br><span class="line">python</span><br><span class="line">import angelheap</span><br><span class="line">angelheap.init_angelheap()</span><br><span class="line">end</span><br><span class="line">end</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">#gdbinit</span><br><span class="line">#! &#x2F;bin&#x2F;bash</span><br><span class="line">cat &gt; &#x2F;root&#x2F;.gdbinit &lt;&lt;  EOF</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;pwngdb.py</span><br><span class="line">source &#x2F;root&#x2F;gdb&#x2F;Pwngdb&#x2F;angelheap&#x2F;gdbinit.py</span><br><span class="line"></span><br><span class="line">define hook-run</span><br><span class="line">python</span><br><span class="line">import angelheap</span><br><span class="line">angelheap.init_angelheap()</span><br><span class="line">end</span><br><span class="line">end</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
-
-<p>给权限<br><code>chmod +x pwndbg gef peda gdbinit</code></p>
-<p>编辑<code>.bashrc</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">###############################################################################</span><br><span class="line"># Pop shell</span><br><span class="line">alias xsh&#x3D;&quot;nohup &#x2F;usr&#x2F;bin&#x2F;x-terminal-emulator -e &#x2F;bin&#x2F;bash &gt;&#x2F;dev&#x2F;null 2&gt;&amp;1 &amp;&quot;</span><br><span class="line"></span><br><span class="line">###############################################################################</span><br><span class="line"># SHELL_HOME</span><br><span class="line">export SHELL_HOME&#x3D;&quot;$HOME&#x2F;toolchain&#x2F;shell&quot;</span><br><span class="line"></span><br><span class="line">export PATH&#x3D;$SHELL_HOME:$PATH</span><br></pre></td></tr></table></figure>
-
-<p>安装patchelf，用来patch libc，pwn_debug依赖<br><code>apt install patchelf</code></p>
-<p>安装pwn_debug</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;sung3r&#x2F;pwn_debug.git</span><br><span class="line">cd pwn_debug</span><br><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
-
-<p>这样就搞定了<br><img src="/2020/05/01/%E6%9F%90%E6%AC%A1%E5%BC%BA%E5%88%B6%E5%85%B3%E6%9C%BA%E5%90%8E%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/44D2CE5E322F37B6EBCC435679B233A8.jpg" alt></p>
-
+<p>没办法，直接抹除重装，先进恢复模式把重要资料搞出来，毕竟数据无价。在<code>磁盘工具-&gt;文件-&gt;新建映像-&gt;来自文件夹的映像...</code>选中需要保存的文件夹，后缀填dmg，存储到U盘或移动硬盘上。</p>
+<p>一个多小时后。。。终于装好了，但所有的环境都丢失了。。。</p>
 	
 	</div>
   <a type="button" href="/2020/05/01/某次强制关机后引发的血案/#more" class="btn btn-default more">Read More</a>
@@ -554,6 +276,8 @@
 		
 			<li><a href="/categories/Docs/">Docs<span>1</span></a></li>
 		
+			<li><a href="/categories/SerenityOS/">SerenityOS<span>1</span></a></li>
+		
 		</ul>
 	</div>
 
@@ -563,7 +287,7 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/环境配置/">环境配置<span>1</span></a></li>
+			<li><a href="/tags/环境配置/">环境配置<span>2</span></a></li>
 		
 		 
 		</ul>
@@ -575,6 +299,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2021/01/31/编译SerenityOS操作系统/"  title="SerenityOS编译步骤" ><i class="fa fa-file-o"></i>编译SerenityOS操作系统</a>
+      </li>
     
       <li>
         <a href="/2020/05/01/某次强制关机后引发的血案/"  title="记录Mac环境配置过程" ><i class="fa fa-file-o"></i>某次强制关机后引发的血案</a>
@@ -607,7 +335,7 @@
   <div class="container-narrow">
   <footer> <p>
   
-  &copy; 2020 sung3r's Blog
+  &copy; 2021 sung3r's Blog
   
       powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
 </p>
