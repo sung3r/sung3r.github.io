@@ -123,6 +123,60 @@
 <div class="row">
 	<div class="col-md-8">
 		<h3 class="title">
+			<a href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/" title="DefCon Quals 2021 mooosl的解题思路">借助DefCon Quals 2021的mooosl学习musl mallocng（源码审计篇）</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-05-31  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/241101" target="_blank" rel="noopener">借助DefCon Quals 2021的mooosl学习musl mallocng（源码审计篇）</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620880732619-1620880732620.png" alt="title"><br>本题来源于DefCon Quals 2021的mooosl，考察点是最新版本musl libc 1.2.2利用。</p>
+<p>关于musl libc的资料比赛期间找到过一篇<a href="https://www.anquanke.com/post/id/202253#h3-15" target="_blank" rel="noopener">从一次 CTF 出题谈 musl libc 堆漏洞利用</a>，碍于musl libc在1.2.x之后的堆管理机制有较大的改版，因而有了该文章。本次文章分上下两篇，从musl libc 1.2.2的源码审计、调试，以及其中的利用机会，再到mooosl这道题的解题过程做一个分析。</p>
+<p>musl libc 1.2.2的源码可以从<a href="https://musl.libc.org/releases/musl-1.2.2.tar.gz" target="_blank" rel="noopener">此处</a>下载获得。1.2.x采用<code>src/malloc/mallocng</code>内的代码，其堆管理结构与早期版本几乎完全不同，而早期的堆管理器则放入了<code>src/malloc/oldmalloc</code>中。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620880937953-1620880937955.png" alt="title"></p>
+<h1 id="调试带符号的musl-libc"><a href="#调试带符号的musl-libc" class="headerlink" title="调试带符号的musl libc"></a>调试带符号的musl libc</h1><h2 id="0x01源码编译"><a href="#0x01源码编译" class="headerlink" title="0x01源码编译"></a>0x01源码编译</h2><p>题目提供的libc.so不带符号，很难通过调试去理解musl堆管理器的数据结构，可以通过源码编译，生成一份带调试符号的libc.so，进行源码级debug。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf .&#x2F;musl-1.2.2.tar.gz</span><br><span class="line">cd musl-1.2.2</span><br><span class="line">mkdir build x64</span><br><span class="line">cd build</span><br><span class="line"></span><br><span class="line">CC&#x3D;&quot;gcc&quot; CXX&#x3D;&quot;g++&quot; \             </span><br><span class="line">    CFLAGS&#x3D;&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error -fno-stack-protector&quot; \</span><br><span class="line">    CXXFLAGS&#x3D;&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error -fno-stack-protector&quot; \</span><br><span class="line">    ..&#x2F;configure --prefix&#x3D;&#x2F;home&#x2F;sung3r&#x2F;workspace&#x2F;sharefd&#x2F;glibc&#x2F;glibc-2.32&#x2F;x64 --disable-werror</span><br><span class="line"></span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>在<code>/src/x64/</code>下找到编译好的libc.so</p>
+<p>通过patchelf将ld.so改成libc.so即可，gdb调试时加上<code>dir /path/to/musl-1.2.2/src/malloc/</code>和<code>dir /path/to/musl-1.2.2/src/malloc/mallocng</code>便可源码调试。</p>
+	
+
+	</div>
+  <a type="button" href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/241101" target="_blank" rel="noopener">借助DefCon Quals 2021的mooosl学习musl mallocng（源码审计篇）</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620880732619-1620880732620.png" alt="title"><br>本题来源于DefCon Quals 2021的mooosl，考察点是最新版本musl libc 1.2.2利用。</p>
+<p>关于musl libc的资料比赛期间找到过一篇<a href="https://www.anquanke.com/post/id/202253#h3-15" target="_blank" rel="noopener">从一次 CTF 出题谈 musl libc 堆漏洞利用</a>，碍于musl libc在1.2.x之后的堆管理机制有较大的改版，因而有了该文章。本次文章分上下两篇，从musl libc 1.2.2的源码审计、调试，以及其中的利用机会，再到mooosl这道题的解题过程做一个分析。</p>
+<p>musl libc 1.2.2的源码可以从<a href="https://musl.libc.org/releases/musl-1.2.2.tar.gz" target="_blank" rel="noopener">此处</a>下载获得。1.2.x采用<code>src/malloc/mallocng</code>内的代码，其堆管理结构与早期版本几乎完全不同，而早期的堆管理器则放入了<code>src/malloc/oldmalloc</code>中。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620880937953-1620880937955.png" alt="title"></p>
+<h1 id="调试带符号的musl-libc"><a href="#调试带符号的musl-libc" class="headerlink" title="调试带符号的musl libc"></a>调试带符号的musl libc</h1><h2 id="0x01源码编译"><a href="#0x01源码编译" class="headerlink" title="0x01源码编译"></a>0x01源码编译</h2><p>题目提供的libc.so不带符号，很难通过调试去理解musl堆管理器的数据结构，可以通过源码编译，生成一份带调试符号的libc.so，进行源码级debug。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">tar -xzvf .&#x2F;musl-1.2.2.tar.gz</span><br><span class="line">cd musl-1.2.2</span><br><span class="line">mkdir build x64</span><br><span class="line">cd build</span><br><span class="line"></span><br><span class="line">CC&#x3D;&quot;gcc&quot; CXX&#x3D;&quot;g++&quot; \             </span><br><span class="line">    CFLAGS&#x3D;&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error -fno-stack-protector&quot; \</span><br><span class="line">    CXXFLAGS&#x3D;&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error -fno-stack-protector&quot; \</span><br><span class="line">    ..&#x2F;configure --prefix&#x3D;&#x2F;home&#x2F;sung3r&#x2F;workspace&#x2F;sharefd&#x2F;glibc&#x2F;glibc-2.32&#x2F;x64 --disable-werror</span><br><span class="line"></span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>在<code>/src/x64/</code>下找到编译好的libc.so</p>
+<p>通过patchelf将ld.so改成libc.so即可，gdb调试时加上<code>dir /path/to/musl-1.2.2/src/malloc/</code>和<code>dir /path/to/musl-1.2.2/src/malloc/mallocng</code>便可源码调试。</p>
+	
+	</div>
+  <a type="button" href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
 			<a href="/2021/05/21/hxpCTF2020-wisdom2：Ptrace参数未校验引发的SerenityOS内核提权/" title="hxpCTF2020 wisdom2的解题思路">hxpCTF2020 wisdom2：Ptrace参数未校验引发的SerenityOS内核提权</a>
 		</h3>
 		</div>
@@ -460,6 +514,8 @@
 		
 			<li><a href="/categories/macOS/">macOS<span>1</span></a></li>
 		
+			<li><a href="/categories/musl-libc/">musl-libc<span>1</span></a></li>
+		
 		</ul>
 	</div>
 
@@ -471,7 +527,7 @@
 		
 			<li><a href="/tags/环境配置/">环境配置<span>2</span></a></li>
 		
-			<li><a href="/tags/解题思路/">解题思路<span>3</span></a></li>
+			<li><a href="/tags/解题思路/">解题思路<span>4</span></a></li>
 		
 		 
 		</ul>
@@ -483,6 +539,10 @@
 <div class="widget">
   <h4>Recent Posts</h4>
   <ul class="entry list-unstyled">
+    
+      <li>
+        <a href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/"  title="DefCon Quals 2021 mooosl的解题思路" ><i class="fa fa-file-o"></i>借助DefCon Quals 2021的mooosl学...</a>
+      </li>
     
       <li>
         <a href="/2021/05/21/hxpCTF2020-wisdom2：Ptrace参数未校验引发的SerenityOS内核提权/"  title="hxpCTF2020 wisdom2的解题思路" ><i class="fa fa-file-o"></i>hxpCTF2020 wisdom2：Ptrace参数...</a>
@@ -498,10 +558,6 @@
     
       <li>
         <a href="/2020/05/01/某次强制关机后引发的血案/"  title="记录Mac环境配置过程" ><i class="fa fa-file-o"></i>某次强制关机后引发的血案</a>
-      </li>
-    
-      <li>
-        <a href="/2020/02/17/DefConCTF-Qualifier-2018-IPwnKit解题思路/"  title="一道macOS内核题的解题思路" ><i class="fa fa-file-o"></i>DefConCTF Qualifier 2018 IP...</a>
       </li>
     
   </ul>
